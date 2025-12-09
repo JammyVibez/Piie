@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd piie && npm install && npm run build",
-  "outputDirectory": "piie/.next",
-  "installCommand": "cd piie && npm install",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
   "framework": "nextjs"
 }
