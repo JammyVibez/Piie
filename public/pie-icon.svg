@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="pieGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="50%" style="stop-color:#EC4899"/>
+      <stop offset="100%" style="stop-color:#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="crustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D97706"/>
+      <stop offset="100%" style="stop-color:#92400E"/>
+    </linearGradient>
+  </defs>
+  <!-- Pie dish/crust -->
+  <ellipse cx="50" cy="72" rx="42" ry="12" fill="url(#crustGradient)"/>
+  <!-- Pie filling -->
+  <path d="M12 55 C12 30 30 12 50 12 C70 12 88 30 88 55 L88 65 C88 68 70 72 50 72 C30 72 12 68 12 65 Z" fill="url(#pieGradient)"/>
+  <!-- Pie slice cut -->
+  <path d="M50 12 L50 72" stroke="#1a1a2e" stroke-width="2" opacity="0.3"/>
+  <path d="M50 42 L78 62" stroke="#1a1a2e" stroke-width="2" opacity="0.3"/>
+  <!-- Steam wisps -->
+  <path d="M30 25 Q25 15 32 8" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6">
+    <animate attributeName="d" dur="2s" repeatCount="indefinite" 
+      values="M30 25 Q25 15 32 8;M30 25 Q35 15 28 8;M30 25 Q25 15 32 8"/>
+  </path>
+  <path d="M50 20 Q45 10 52 3" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6">
+    <animate attributeName="d" dur="2.5s" repeatCount="indefinite" 
+      values="M50 20 Q45 10 52 3;M50 20 Q55 10 48 3;M50 20 Q45 10 52 3"/>
+  </path>
+  <path d="M70 25 Q65 15 72 8" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6">
+    <animate attributeName="d" dur="2.2s" repeatCount="indefinite" 
+      values="M70 25 Q65 15 72 8;M70 25 Q75 15 68 8;M70 25 Q65 15 72 8"/>
+  </path>
+  <!-- Highlights on pie -->
+  <ellipse cx="35" cy="40" rx="8" ry="4" fill="#fff" opacity="0.2"/>
+</svg>

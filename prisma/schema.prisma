@@ -1,0 +1,1262 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  username             String               @unique
+  name                 String
+  passwordHash         String
+  avatar               String?
+  bannerImage          String?
+  bio                  String?
+  location             String?
+  userRole             UserRole             @default(explorer)
+  workerRole           WorkerRole?
+  level                Int                  @default(1)
+  xp                   Int                  @default(0)
+  influenceScore       Int                  @default(0)
+  realm                String?
+  isOnline             Boolean              @default(false)
+  lastSeen             DateTime?
+  emailVerified        Boolean              @default(false)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  audioParticipations  AudioParticipant[]   @relation("audioParticipant")
+  hostedAudioRooms     AudioRoom[]          @relation("audioRoomHost")
+  bookmarks            Bookmark[]
+  bookmarkCollections  BookmarkCollection[]
+  challengeProgress    ChallengeProgress[]
+  comments             Comment[]
+  communitiesOwned     Community[]          @relation("communityOwners")
+  communityMemberships CommunityMember[]    @relation("communityMembers")
+  conversations1       Conversation[]       @relation("user1")
+  conversations2       Conversation[]       @relation("user2")
+  eventsOrganized      Event[]              @relation("eventOrganizers")
+  eventAttendances     EventAttendee[]      @relation("eventAttendings")
+  following            Follow[]             @relation("following")
+  followers            Follow[]             @relation("followers")
+  fusionLayers         FusionLayer[]        @relation("layerAuthor")
+  fusionPosts          FusionPost[]         @relation("fusionOwner")
+  fusionReactions      FusionReaction[]     @relation("reactionUser")
+  leaderboardEntries   LeaderboardEntry[]
+  likes                Like[]
+  mediaItems           Media[]              @relation("userMedia")
+  mediaAssets          MediaAsset[]         @relation("userMediaAssets")
+  receivedMessages     Message[]            @relation("receivedMessages")
+  sentMessages         Message[]            @relation("sentMessages")
+  messageReactions     MessageReaction[]
+  notifications        Notification[]       @relation("recipient")
+  notificationsSent    Notification[]       @relation("sender")
+  passwordResetTokens  PasswordResetToken[]
+  pollVotes            PollVote[]
+  posts                Post[]
+  reportedItems        Report[]             @relation("reported")
+  reports              Report[]             @relation("reporter")
+  ownedRooms           Room[]               @relation("roomOwner")
+  roomMemberships      RoomMember[]         @relation("roomMember")
+  roomMessages         RoomMessage[]        @relation("roomMessageAuthor")
+  hostedSessions       RoomSession[]        @relation("sessionHost")
+  sessions             Session[]
+  threadAuthored       Thread[]             @relation("threadAuthors")
+  threadMessages       ThreadMessage[]      @relation("threadMessages")
+  achievements         UserAchievement[]
+  badges               UserBadge[]
+  onboarding           UserOnboarding?
+  userPreference       UserPreference?      @relation("userPreference")
+  settings             UserSettings?
+  xpEvents             XPEvent[]
+
+  @@index([email])
+  @@index([username])
+}
+
+model UserSettings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  notifyLikes        Boolean  @default(true)
+  notifyComments     Boolean  @default(true)
+  notifyFollows      Boolean  @default(true)
+  notifyMentions     Boolean  @default(true)
+  notifyMessages     Boolean  @default(true)
+  profileVisibility  String   @default("public")
+  showOnlineStatus   Boolean  @default(true)
+  allowMessages      String   @default("everyone")
+  theme              String   @default("gojo")
+  chatWallpaper      String?
+  language           String   @default("en")
+  timezone           String   @default("UTC")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  deviceType   String?
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FusionPost {
+  id                  String               @id @default(cuid())
+  ownerId             String
+  title               String
+  seedContent         String
+  seedMediaUrl        String?
+  seedType            FusionLayerType      @default(text)
+  privacy             FusionPermission     @default(public)
+  allowedContributors FusionPermission     @default(public)
+  allowedLayerTypes   FusionLayerType[]    @default([text, image, video, voice, draw, sticker, overlay])
+  moderationMode      FusionModerationMode @default(none)
+  currentState        FusionPostState      @default(active)
+  viewMode            FusionViewMode       @default(merged)
+  forkCount           Int                  @default(0)
+  forkedFromId        String?
+  contributorCount    Int                  @default(0)
+  totalLayers         Int                  @default(0)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  layers              FusionLayer[]
+  forkedFrom          FusionPost?          @relation("forks", fields: [forkedFromId], references: [id])
+  forks               FusionPost[]         @relation("forks")
+  owner               User                 @relation("fusionOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([createdAt])
+}
+
+model FusionLayer {
+  id            String           @id @default(cuid())
+  fusionPostId  String
+  authorId      String
+  type          FusionLayerType
+  content       String
+  mediaUrl      String?
+  positionX     Float?
+  positionY     Float?
+  layerOrder    Int              @default(0)
+  parentLayerId String?
+  likes         Int              @default(0)
+  isApproved    Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  author        User             @relation("layerAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  fusionPost    FusionPost       @relation(fields: [fusionPostId], references: [id], onDelete: Cascade)
+  parentLayer   FusionLayer?     @relation("layerParent", fields: [parentLayerId], references: [id])
+  childLayers   FusionLayer[]    @relation("layerParent")
+  reactions     FusionReaction[]
+
+  @@index([fusionPostId])
+  @@index([authorId])
+  @@index([layerOrder])
+}
+
+model FusionReaction {
+  id        String      @id @default(cuid())
+  layerId   String
+  userId    String
+  type      String      @default("like")
+  createdAt DateTime    @default(now())
+  layer     FusionLayer @relation(fields: [layerId], references: [id], onDelete: Cascade)
+  user      User        @relation("reactionUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([layerId, userId, type])
+  @@index([layerId])
+}
+
+model Room {
+  id            String          @id @default(cuid())
+  ownerId       String
+  type          RoomType
+  title         String
+  description   String?
+  privacy       RoomPrivacy     @default(public)
+  inviteCode    String?         @unique
+  maxMembers    Int             @default(10)
+  isLive        Boolean         @default(false)
+  theme         String?
+  gameId        String?
+  gameName      String?
+  difficulty    String?
+  lobbyCode     String?
+  platform      String?
+  anonymousMode Boolean         @default(false)
+  fusionPostId  String?
+  expiresAt     DateTime
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  owner         User            @relation("roomOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  highlights    RoomHighlight[]
+  members       RoomMember[]
+  memory        RoomMemory?
+  messages      RoomMessage[]
+  sessions      RoomSession[]
+
+  @@index([ownerId])
+  @@index([type])
+  @@index([expiresAt])
+  @@index([isLive])
+}
+
+model RoomMember {
+  id            String     @id @default(cuid())
+  roomId        String
+  userId        String
+  role          MemberRole @default(member)
+  team          String?
+  readyState    Boolean    @default(false)
+  isAnonymous   Boolean    @default(false)
+  anonymousName String?
+  joinedAt      DateTime   @default(now())
+  room          Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user          User       @relation("roomMember", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@index([userId])
+}
+
+model RoomMessage {
+  id        String   @id @default(cuid())
+  roomId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  author    User     @relation("roomMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model RoomSession {
+  id          String            @id @default(cuid())
+  roomId      String
+  hostId      String
+  streamUrl   String?
+  viewerCount Int               @default(0)
+  status      GameSessionStatus @default(waiting)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  createdAt   DateTime          @default(now())
+  results     MatchResult[]
+  host        User              @relation("sessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  room        Room              @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([status])
+}
+
+model MatchResult {
+  id          String      @id @default(cuid())
+  sessionId   String
+  rankings    Json
+  winningTeam String?
+  createdAt   DateTime    @default(now())
+  session     RoomSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+model RoomHighlight {
+  id        String   @id @default(cuid())
+  roomId    String
+  title     String
+  thumbnail String?
+  videoUrl  String?
+  duration  Int      @default(0)
+  authorId  String
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([likes])
+}
+
+model RoomMemory {
+  id            String   @id @default(cuid())
+  roomId        String   @unique
+  title         String
+  summary       Json?
+  topClips      Json?
+  topPlayers    Json?
+  totalMessages Int      @default(0)
+  createdAt     DateTime @default(now())
+  room          Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model Community {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  slug        String            @unique
+  description String?
+  privacy     String            @default("public")
+  ownerId     String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  avatar      String?
+  banner      String?
+  category    String            @default("General")
+  onlineCount Int               @default(0)
+  postsCount  Int               @default(0)
+  owner       User              @relation("communityOwners", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     CommunityMember[]
+  threads     Thread[]
+
+  @@index([ownerId])
+  @@index([category])
+}
+
+model CommunityMember {
+  id          String    @id @default(cuid())
+  communityId String
+  userId      String
+  role        String    @default("member")
+  joinedAt    DateTime  @default(now())
+  isBanned    Boolean   @default(false)
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation("communityMembers", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([communityId])
+  @@index([userId])
+}
+
+model Thread {
+  id          String          @id @default(cuid())
+  communityId String?
+  authorId    String
+  title       String
+  slug        String?
+  content     String?
+  isLocked    Boolean         @default(false)
+  isPinned    Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  author      User            @relation("threadAuthors", fields: [authorId], references: [id], onDelete: Cascade)
+  community   Community?      @relation(fields: [communityId], references: [id])
+  messages    ThreadMessage[]
+
+  @@index([communityId])
+  @@index([authorId])
+}
+
+model ThreadMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  authorId  String
+  content   String
+  isEdited  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation("threadMessages", fields: [authorId], references: [id], onDelete: Cascade)
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([authorId])
+}
+
+model Event {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  location    String?
+  organizerId String
+  startAt     DateTime
+  endAt       DateTime?
+  capacity    Int?
+  isOnline    Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  organizer   User            @relation("eventOrganizers", fields: [organizerId], references: [id], onDelete: Cascade)
+  attendees   EventAttendee[]
+
+  @@index([organizerId])
+}
+
+model EventAttendee {
+  id       String   @id @default(cuid())
+  eventId  String
+  userId   String
+  status   String   @default("going")
+  joinedAt DateTime @default(now())
+  event    Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user     User     @relation("eventAttendings", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  userId    String?
+  url       String
+  type      String
+  size      Int?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation("userMedia", fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model UserPreference {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  preferences Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation("userPreference", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([code])
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  icon        String
+  rarity      BadgeRarity @default(common)
+  createdAt   DateTime    @default(now())
+  description String?
+  challenges  Challenge[] @relation("challengeBadge")
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+}
+
+model Achievement {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  description String
+  icon        String
+  rarity      BadgeRarity       @default(common)
+  createdAt   DateTime          @default(now())
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model Post {
+  id             String         @id @default(cuid())
+  authorId       String
+  title          String
+  description    String
+  content        String?
+  images         String[]       @default([])
+  video          String?
+  videoThumbnail String?
+  videoDuration  Int?
+  postType       PostType       @default(post)
+  visibility     PostVisibility @default(public)
+  rarity         PostRarity     @default(common)
+  likes          Int            @default(0)
+  commentsCount  Int            @default(0)
+  shares         Int            @default(0)
+  views          Int            @default(0)
+  isScheduled    Boolean        @default(false)
+  scheduledFor   DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  bookmarkedBy   Bookmark[]
+  comments       Comment[]
+  likedBy        Like[]
+  notifications  Notification[]
+  poll           Poll?
+  author         User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tags           PostTag[]
+  reports        Report[]
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([postType])
+}
+
+model PostTag {
+  id        String   @id @default(cuid())
+  postId    String
+  tag       String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, tag])
+  @@index([tag])
+}
+
+model Poll {
+  id               String       @id @default(cuid())
+  postId           String       @unique
+  question         String
+  totalVotes       Int          @default(0)
+  endsAt           DateTime?
+  isMultipleChoice Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  post             Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  options          PollOption[]
+  votes            PollVote[]
+}
+
+model PollOption {
+  id        String     @id @default(cuid())
+  pollId    String
+  text      String
+  votes     Int        @default(0)
+  order     Int        @default(0)
+  createdAt DateTime   @default(now())
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  pollVotes PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id        String     @id @default(cuid())
+  userId    String
+  pollId    String
+  optionId  String
+  createdAt DateTime   @default(now())
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pollId])
+  @@index([pollId])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  postId    String
+  authorId  String
+  parentId  String?
+  content   String
+  image     String?
+  likes     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("replies")
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Bookmark {
+  id           String              @id @default(cuid())
+  userId       String
+  postId       String
+  collectionId String?
+  createdAt    DateTime            @default(now())
+  collection   BookmarkCollection? @relation(fields: [collectionId], references: [id])
+  post         Post                @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([collectionId])
+}
+
+model BookmarkCollection {
+  id        String     @id @default(cuid())
+  userId    String
+  name      String
+  color     String     @default("bg-primary")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  bookmarks Bookmark[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Conversation {
+  id          String    @id @default(cuid())
+  user1Id     String
+  user2Id     String
+  isPinned    Boolean   @default(false)
+  isMuted     Boolean   @default(false)
+  isArchived  Boolean   @default(false)
+  lastUpdated DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  user1       User      @relation("user1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2       User      @relation("user2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model Message {
+  id             String              @id @default(cuid())
+  conversationId String
+  senderId       String
+  receiverId     String
+  content        String
+  status         MessageStatus       @default(sent)
+  read           Boolean             @default(false)
+  isEdited       Boolean             @default(false)
+  editedAt       DateTime?
+  replyToId      String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  conversation   Conversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  receiver       User                @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  replyTo        Message?            @relation("replies", fields: [replyToId], references: [id])
+  replies        Message[]           @relation("replies")
+  sender         User                @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  attachments    MessageAttachment[]
+  reactions      MessageReaction[]
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model MessageAttachment {
+  id        String   @id @default(cuid())
+  messageId String
+  type      String
+  url       String
+  name      String
+  size      Int?
+  thumbnail String?
+  createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  senderId    String?
+  type        NotificationType
+  title       String
+  message     String
+  targetId    String?
+  targetType  String?
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  recipient   User             @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender      User?            @relation("sender", fields: [senderId], references: [id])
+  post        Post?            @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId])
+  @@index([read])
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  reporterId     String
+  reportedUserId String?
+  reportedPostId String?
+  targetType     String?
+  reason         ReportReason
+  description    String?
+  status         ReportStatus @default(pending)
+  createdAt      DateTime     @default(now())
+  resolvedAt     DateTime?
+  post           Post?        @relation(fields: [reportedPostId], references: [id], onDelete: Cascade)
+  reported       User?        @relation("reported", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reporter       User         @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([reportedPostId])
+  @@index([status])
+}
+
+model TrendingTopic {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  hashtag   String   @unique
+  posts     Int      @default(0)
+  trend     String   @default("+0%")
+  color     String?
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([posts(sort: Desc)])
+}
+
+model Challenge {
+  id              String              @id @default(cuid())
+  title           String
+  description     String
+  icon            String              @default("trophy")
+  type            ChallengeType       @default(daily)
+  status          ChallengeStatus     @default(active)
+  xpReward        Int                 @default(100)
+  badgeRewardId   String?
+  requirement     String
+  requirementType String              @default("count")
+  targetValue     Int                 @default(1)
+  startsAt        DateTime            @default(now())
+  endsAt          DateTime?
+  communityId     String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  badgeReward     Badge?              @relation("challengeBadge", fields: [badgeRewardId], references: [id])
+  participants    ChallengeProgress[]
+
+  @@index([type])
+  @@index([status])
+  @@index([startsAt])
+  @@index([endsAt])
+}
+
+model ChallengeProgress {
+  id           String    @id @default(cuid())
+  userId       String
+  challengeId  String
+  currentValue Int       @default(0)
+  isCompleted  Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  challenge    Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId])
+  @@index([userId])
+  @@index([challengeId])
+  @@index([isCompleted])
+}
+
+model XPEvent {
+  id         String      @id @default(cuid())
+  userId     String
+  type       XPEventType
+  xpAmount   Int
+  sourceId   String?
+  sourceType String?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model LeaderboardSeason {
+  id          String             @id @default(cuid())
+  name        String
+  description String?
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  entries     LeaderboardEntry[]
+
+  @@index([isActive])
+  @@index([startsAt])
+  @@index([endsAt])
+}
+
+model LeaderboardEntry {
+  id        String            @id @default(cuid())
+  userId    String
+  seasonId  String
+  xpEarned  Int               @default(0)
+  rank      Int               @default(0)
+  updatedAt DateTime          @updatedAt
+  season    LeaderboardSeason @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, seasonId])
+  @@index([seasonId])
+  @@index([xpEarned(sort: Desc)])
+  @@index([rank])
+}
+
+model AudioRoom {
+  id           String             @id @default(cuid())
+  communityId  String?
+  hostId       String
+  title        String
+  description  String?
+  topic        String?
+  status       AudioRoomStatus    @default(waiting)
+  maxSpeakers  Int                @default(10)
+  isRecording  Boolean            @default(false)
+  scheduledFor DateTime?
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  participants AudioParticipant[]
+  host         User               @relation("audioRoomHost", fields: [hostId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([hostId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+model AudioParticipant {
+  id          String    @id @default(cuid())
+  audioRoomId String
+  userId      String
+  role        String    @default("listener")
+  isMuted     Boolean   @default(true)
+  isSpeaking  Boolean   @default(false)
+  handRaised  Boolean   @default(false)
+  joinedAt    DateTime  @default(now())
+  leftAt      DateTime?
+  audioRoom   AudioRoom @relation(fields: [audioRoomId], references: [id], onDelete: Cascade)
+  user        User      @relation("audioParticipant", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([audioRoomId, userId])
+  @@index([audioRoomId])
+  @@index([userId])
+}
+
+model MediaAsset {
+  id           String          @id @default(cuid())
+  userId       String
+  provider     StorageProvider @default(supabase)
+  url          String
+  publicUrl    String
+  path         String
+  type         String
+  mimeType     String?
+  size         Int?
+  width        Int?
+  height       Int?
+  duration     Int?
+  thumbnailUrl String?
+  metadata     Json?
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  user         User            @relation("userMediaAssets", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([provider])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  type        String   @default("string")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+model CommunityPost {
+  id                    String                 @id @default(cuid())
+  communityId           String
+  authorId              String
+  content               String
+  images                String[]               @default([])
+  video                 String?
+  likes                 Int                    @default(0)
+  commentsCount         Int                    @default(0)
+  shares                Int                    @default(0)
+  isPinned              Boolean                @default(false)
+  isPromoted            Boolean                @default(false)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  communityPostComments CommunityPostComment[]
+  communityPostLikes    CommunityPostLike[]
+
+  @@index([communityId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([isPinned])
+}
+
+model CommunityPostComment {
+  id              String                 @id @default(cuid())
+  communityPostId String
+  authorId        String
+  parentId        String?
+  content         String
+  likes           Int                    @default(0)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  communityPost   CommunityPost          @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  parent          CommunityPostComment?  @relation("communityCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         CommunityPostComment[] @relation("communityCommentReplies")
+
+  @@index([communityPostId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+model CommunityPostLike {
+  id              String        @id @default(cuid())
+  communityPostId String
+  userId          String
+  createdAt       DateTime      @default(now())
+  communityPost   CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+
+  @@unique([communityPostId, userId])
+  @@index([communityPostId])
+  @@index([userId])
+}
+
+model ThreadLike {
+  id        String   @id @default(cuid())
+  threadId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([threadId, userId])
+  @@index([threadId])
+  @@index([userId])
+}
+
+model ThreadShare {
+  id        String   @id @default(cuid())
+  threadId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([threadId])
+  @@index([userId])
+}
+
+model CommunityMessage {
+  id          String                     @id @default(cuid())
+  communityId String
+  senderId    String
+  content     String
+  attachments String[]                   @default([])
+  isEdited    Boolean                    @default(false)
+  editedAt    DateTime?
+  isPinned    Boolean                    @default(false)
+  replyToId   String?
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+  replyTo     CommunityMessage?          @relation("communityMessageReplies", fields: [replyToId], references: [id])
+  replies     CommunityMessage[]         @relation("communityMessageReplies")
+  reactions   CommunityMessageReaction[]
+
+  @@index([communityId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model CommunityMessageReaction {
+  id        String           @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime         @default(now())
+  message   CommunityMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+}
+
+model UserOnboarding {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  step              Int       @default(0)
+  isCompleted       Boolean   @default(false)
+  completedSteps    String[]  @default([])
+  selectedInterests String[]  @default([])
+  selectedRole      String?
+  profileCompleted  Boolean   @default(false)
+  firstPostCreated  Boolean   @default(false)
+  firstFollowDone   Boolean   @default(false)
+  tutorialCompleted Boolean   @default(false)
+  completedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isCompleted])
+}
+
+enum UserRole {
+  creator
+  analyst
+  entertainer
+  educator
+  explorer
+}
+
+enum WorkerRole {
+  admin
+  mod
+  developer
+  support
+}
+
+enum BadgeRarity {
+  common
+  rare
+  epic
+  legendary
+}
+
+enum PostType {
+  post
+  insight
+  media
+  poll
+  video
+  fusion
+}
+
+enum PostRarity {
+  common
+  rare
+  epic
+  legendary
+}
+
+enum PostVisibility {
+  public
+  followers
+  private
+}
+
+enum MessageStatus {
+  sending
+  sent
+  delivered
+  read
+  failed
+}
+
+enum NotificationType {
+  like
+  comment
+  follow
+  mention
+  message
+  system
+  room_invite
+  fusion_layer
+}
+
+enum ReportReason {
+  spam
+  harassment
+  hate_speech
+  violence
+  nudity
+  false_info
+  copyright
+  other
+}
+
+enum ReportStatus {
+  pending
+  reviewing
+  resolved
+  dismissed
+}
+
+enum FusionLayerType {
+  text
+  image
+  video
+  voice
+  draw
+  sticker
+  overlay
+}
+
+enum FusionPermission {
+  public
+  followers
+  invited
+  close_circle
+}
+
+enum FusionModerationMode {
+  auto
+  pre_approve
+  none
+}
+
+enum FusionViewMode {
+  merged
+  timeline
+  step_through
+}
+
+enum FusionPostState {
+  active
+  locked
+  archived
+}
+
+enum RoomType {
+  game
+  post_sharing
+  discussion
+  collab
+  vibe
+  anonymous
+}
+
+enum RoomPrivacy {
+  public
+  private
+  friends_only
+  invite_code
+}
+
+enum MemberRole {
+  owner
+  moderator
+  member
+  guest
+  spectator
+}
+
+enum GameSessionStatus {
+  waiting
+  in_progress
+  completed
+}
+
+enum ChallengeType {
+  daily
+  weekly
+  monthly
+  special
+  community
+}
+
+enum ChallengeStatus {
+  active
+  completed
+  expired
+  cancelled
+}
+
+enum XPEventType {
+  post_created
+  comment_added
+  like_received
+  like_given
+  follow_received
+  follow_given
+  challenge_completed
+  achievement_unlocked
+  badge_earned
+  login_streak
+  first_post
+  first_comment
+  community_joined
+  room_created
+  room_participated
+  fusion_contributed
+}
+
+enum StorageProvider {
+  supabase
+  cloudinary
+}
+
+enum AudioRoomStatus {
+  waiting
+  live
+  ended
+}
