@@ -55,7 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   const loadUser = useCallback(async () => {
-    const storedToken = localStorage.getItem("auth_token")
+    // Check both localStorage and cookies for token
+    const storedToken = localStorage.getItem("auth_token") || 
+      (typeof document !== "undefined" ? document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1] : null)
+    
     if (!storedToken) {
       setIsLoading(false)
       return
@@ -73,15 +76,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.success) {
           setUser(data.data.user)
           setToken(storedToken)
+          // Ensure both localStorage and cookie are set
+          localStorage.setItem("auth_token", storedToken)
         } else {
           localStorage.removeItem("auth_token")
+          if (typeof document !== "undefined") {
+            document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+          }
         }
       } else {
         localStorage.removeItem("auth_token")
+        if (typeof document !== "undefined") {
+          document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+        }
       }
     } catch (error) {
       console.error("Error loading user:", error)
       localStorage.removeItem("auth_token")
+      if (typeof document !== "undefined") {
+        document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+      }
     } finally {
       setIsLoading(false)
     }
@@ -133,6 +147,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data.data.user)
         setToken(data.data.token)
         localStorage.setItem("auth_token", data.data.token)
+        // Cookie is set by the server, but ensure it's also accessible
+        if (typeof document !== "undefined") {
+          document.cookie = `auth_token=${data.data.token}; max-age=${60 * 60 * 24 * 7}; path=/; SameSite=Lax`
+        }
         return { success: true }
       } else {
         return { success: false, error: data.error }
@@ -159,6 +177,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setToken(null)
       localStorage.removeItem("auth_token")
+      if (typeof document !== "undefined") {
+        document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+      }
       router.push("/auth/login")
     }
   }

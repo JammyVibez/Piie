@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const token = await generateToken(newUser)
     const { followers, following } = await getFollowCounts(newUser.id)
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: {
         user: {
@@ -74,6 +74,17 @@ export async function POST(request: Request) {
       },
       message: "Registration successful",
     })
+
+    // Set cookie for session persistence
+    response.cookies.set("auth_token", token, {
+      httpOnly: false, // Allow client-side access
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    })
+
+    return response
   } catch (error) {
     console.error("[v0] Registration error:", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })

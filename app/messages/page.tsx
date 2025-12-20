@@ -601,17 +601,79 @@ function VoiceRecorder({
   onStop,
   onCancel,
 }: {
-  onStop: (duration: number) => void
+  onStop: (audioBlob: Blob, duration: number) => void
   onCancel: () => void
 }) {
   const [duration, setDuration] = useState(0)
+  const [isRecording, setIsRecording] = useState(false)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const streamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDuration((d) => d + 1)
-    }, 1000)
-    return () => clearInterval(interval)
+    let interval: NodeJS.Timeout
+    if (isRecording) {
+      interval = setInterval(() => {
+        setDuration((d) => d + 1)
+      }, 1000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isRecording])
+
+  useEffect(() => {
+    const startRecording = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        streamRef.current = stream
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm;codecs=opus'
+        })
+        mediaRecorderRef.current = mediaRecorder
+        audioChunksRef.current = []
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data)
+          }
+        }
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+          onStop(audioBlob, duration)
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop())
+          }
+        }
+
+        mediaRecorder.start()
+        setIsRecording(true)
+      } catch (error) {
+        console.error("Error accessing microphone:", error)
+        alert("Could not access microphone. Please check permissions.")
+        onCancel()
+      }
+    }
+
+    startRecording()
+
+    return () => {
+      if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop()
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+      }
+    }
   }, [])
+
+  const handleStop = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop()
+      setIsRecording(false)
+    }
+  }
 
   const formatDuration = (secs: number) => {
     const mins = Math.floor(secs / 60)
@@ -638,7 +700,7 @@ function VoiceRecorder({
       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={onCancel}>
         <X size={18} className="text-destructive" />
       </Button>
-      <Button size="icon" className="h-8 w-8 bg-destructive hover:bg-destructive/90" onClick={() => onStop(duration)}>
+      <Button size="icon" className="h-8 w-8 bg-destructive hover:bg-destructive/90" onClick={handleStop}>
         <StopCircle size={18} />
       </Button>
     </div>
@@ -658,6 +720,10 @@ export default function DMPage() {
   const [showMobileChat, setShowMobileChat] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [showGifPicker, setShowGifPicker] = useState(false)
+  const [showStickerPicker, setShowStickerPicker] = useState(false)
+  const [gifSearchQuery, setGifSearchQuery] = useState("")
+  const [gifs, setGifs] = useState<any[]>([])
   const [chatWallpaper, setChatWallpaper] = useState("default")
   const [isLoadingConversations, setIsLoadingConversations] = useState(true)
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
@@ -822,37 +888,20 @@ export default function DMPage() {
     }
   }
 
-  const handleSendVoiceMessage = (duration: number) => {
-    if (!selectedConversation || !currentUser) return
+  const handleSendVoiceMessage = async (audioBlob: Blob, duration: number) => {
+    if (!selectedConversation || !currentUser || !token) return
 
-    const newMessage: Message = {
-      id: `m${Date.now()}`,
-      sender: currentUser,
-      receiver: selectedConversation.otherUser,
-      content: "",
-      timestamp: new Date(),
-      read: false,
-      status: "sending",
-      isOwn: true,
-      attachments: [
-        {
-          id: `a${Date.now()}`,
-          type: "audio",
-          url: "", // URL will be updated after upload
-          name: `Voice message (${duration}s)`,
-        },
-      ],
-    }
-
-    setMessages((prev) => [...prev, newMessage])
     setIsRecording(false)
 
-    // Simulate upload and then send
-    setTimeout(() => {
-      // In a real app, you'd upload the audio blob here and get a URL
-      const dummyAudioUrl = "https://example.com/audio/dummy.mp3"
-      handleSendMessage("", [new File([dummyAudioUrl], "voice_message.mp3", { type: "audio/mpeg" })])
-    }, 1000)
+    try {
+      // Convert blob to file
+      const audioFile = new File([audioBlob], `voice_message_${Date.now()}.webm`, { type: 'audio/webm' })
+      
+      // Upload the audio file
+      await handleSendMessage("", [audioFile])
+    } catch (error) {
+      console.error("Failed to send voice message:", error)
+    }
   }
 
   const startNewChat = async (user: User) => {
@@ -1327,12 +1376,53 @@ export default function DMPage() {
                             variant="ghost"
                             size="icon"
                             className="h-10 w-10 rounded-full flex-shrink-0"
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => {
+                              setShowGifPicker(false)
+                              setShowStickerPicker(false)
+                              setShowEmojiPicker(false)
+                              fileInputRef.current?.click()
+                            }}
                           >
                             <Paperclip size={20} />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Attach File</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-10 w-10 rounded-full flex-shrink-0"
+                            onClick={() => {
+                              setShowGifPicker(!showGifPicker)
+                              setShowStickerPicker(false)
+                              setShowEmojiPicker(false)
+                            }}
+                          >
+                            <span className="text-lg">🎬</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>GIF</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-10 w-10 rounded-full flex-shrink-0"
+                            onClick={() => {
+                              setShowStickerPicker(!showStickerPicker)
+                              setShowGifPicker(false)
+                              setShowEmojiPicker(false)
+                            }}
+                          >
+                            <span className="text-lg">🎨</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Stickers</TooltipContent>
                       </Tooltip>
 
                       <Tooltip>
@@ -1364,26 +1454,97 @@ export default function DMPage() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      onClick={() => {
+                        setShowEmojiPicker(!showEmojiPicker)
+                        setShowGifPicker(false)
+                        setShowStickerPicker(false)
+                      }}
                     >
                       <Smile size={20} className="text-muted-foreground" />
                     </Button>
 
                     {/* Emoji Picker */}
                     {showEmojiPicker && (
-                      <div className="absolute bottom-full right-0 mb-2 p-3 bg-card border border-border rounded-xl shadow-xl scale-in w-72">
+                      <div className="absolute bottom-full right-0 mb-2 p-3 bg-card border border-border rounded-xl shadow-xl scale-in w-72 max-h-64 overflow-y-auto">
                         <div className="grid grid-cols-8 gap-1">
                           {Object.values(emojiCategories)
                             .flat()
                             .map((emoji, i) => (
                               <button
                                 key={i}
-                                onClick={() => setMessageInput((prev) => prev + emoji)}
+                                onClick={() => {
+                                  setMessageInput((prev) => prev + emoji)
+                                  setShowEmojiPicker(false)
+                                }}
                                 className="p-1.5 hover:bg-muted rounded-lg transition-colors text-lg"
                               >
                                 {emoji}
                               </button>
                             ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* GIF Picker */}
+                    {showGifPicker && (
+                      <div className="absolute bottom-full right-0 mb-2 p-3 bg-card border border-border rounded-xl shadow-xl scale-in w-80 max-h-96 overflow-y-auto">
+                        <div className="space-y-3">
+                          <Input
+                            placeholder="Search GIFs..."
+                            value={gifSearchQuery}
+                            onChange={(e) => setGifSearchQuery(e.target.value)}
+                            className="mb-2"
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            {/* Sample GIFs - In production, use Giphy API */}
+                            {[
+                              "https://media.giphy.com/media/3o7aCTPPm4OHfRLSH6/giphy.gif",
+                              "https://media.giphy.com/media/l0MYC0LajaoPoHABu/giphy.gif",
+                              "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
+                              "https://media.giphy.com/media/3o7abldb0xnta2S3ug/giphy.gif",
+                            ].map((gifUrl, i) => (
+                              <button
+                                key={i}
+                                onClick={async () => {
+                                  // Send GIF as image attachment
+                                  try {
+                                    const response = await fetch(gifUrl)
+                                    const blob = await response.blob()
+                                    const file = new File([blob], `gif_${Date.now()}.gif`, { type: 'image/gif' })
+                                    await handleSendMessage("", [file])
+                                    setShowGifPicker(false)
+                                  } catch (error) {
+                                    console.error("Failed to send GIF:", error)
+                                  }
+                                }}
+                                className="relative aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
+                              >
+                                <img src={gifUrl} alt={`GIF ${i + 1}`} className="w-full h-full object-cover" />
+                              </button>
+                            ))}
+                          </div>
+                          <p className="text-xs text-muted-foreground text-center">Powered by Giphy</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sticker Picker */}
+                    {showStickerPicker && (
+                      <div className="absolute bottom-full right-0 mb-2 p-3 bg-card border border-border rounded-xl shadow-xl scale-in w-72 max-h-64 overflow-y-auto">
+                        <div className="grid grid-cols-4 gap-2">
+                          {/* Sample Stickers - In production, use your sticker pack */}
+                          {["😀", "😂", "🥰", "😎", "🤔", "😴", "🤗", "😋", "🥳", "😍", "🤩", "😇"].map((sticker, i) => (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                setMessageInput((prev) => prev + sticker)
+                                setShowStickerPicker(false)
+                              }}
+                              className="p-3 hover:bg-muted rounded-lg transition-colors text-3xl"
+                            >
+                              {sticker}
+                            </button>
+                          ))}
                         </div>
                       </div>
                     )}

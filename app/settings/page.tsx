@@ -311,7 +311,7 @@ export default function SettingsPage() {
 
   const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !token) return
+    if (!file || !token || !user) return
 
     setIsUploading(true)
     try {
@@ -329,8 +329,28 @@ export default function SettingsPage() {
 
       const data = await response.json()
       if (data.success) {
-        setPreviewBanner(data.data.url)
-        setFormData((prev) => ({ ...prev, bannerImage: data.data.url }))
+        const bannerUrl = data.data.url
+        setPreviewBanner(bannerUrl)
+        setFormData((prev) => ({ ...prev, bannerImage: bannerUrl }))
+        
+        // Auto-save banner immediately after upload
+        const saveResponse = await fetch(`/api/users/${user.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            bannerImage: bannerUrl,
+          }),
+        })
+
+        const saveResult = await saveResponse.json()
+        if (saveResult.success) {
+          console.log("Banner saved successfully")
+        } else {
+          console.error("Failed to save banner:", saveResult.error)
+        }
       }
     } catch (error) {
       console.error("Banner upload error:", error)

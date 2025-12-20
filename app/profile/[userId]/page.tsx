@@ -135,16 +135,19 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     name: user.name,
     username: user.username,
     avatar: user.avatar,
-    banner: user.banner,
+    banner: user.bannerImage,
     bio: user.bio,
     level: user.level,
     xp: user.xp,
-    isVerified: user.isVerified,
+    isVerified: user.emailVerified || false,
     followers: user._count.followers,
     following: user._count.following,
     postsCount: user._count.posts,
     createdAt: user.createdAt,
     location: user.location,
+    userRole: user.userRole,
+    workerRole: user.workerRole,
+    realm: user.realm,
   }
 
   const formattedPosts = userPosts.map((post) => ({

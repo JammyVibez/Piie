@@ -138,21 +138,35 @@ export function ProfileContent({ user, userPosts, userId }: ProfileContentProps)
           <img
             src={user.banner}
             alt="Profile banner"
-            className="w-full h-full object-cover opacity-80"
+            className="w-full h-full object-cover opacity-80 transform hover:scale-105 transition-transform duration-700"
           />
         ) : (
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
           </div>
         )}
+        {/* 3D Parallax effect overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent"></div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-32 relative z-10 mb-8">
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <div className="flex flex-col items-center md:items-start gap-4 flex-shrink-0">
-            <div className="w-40 h-40 rounded-2xl border-4 border-background shadow-2xl overflow-hidden ring-2 ring-primary/50">
-              <img src={user.avatar || "/placeholder.svg"} alt={user.name} className="w-full h-full object-cover" />
+            <div className="relative group">
+              <div className="w-40 h-40 rounded-2xl border-4 border-background shadow-2xl overflow-hidden ring-2 ring-primary/50 transform transition-all duration-500 hover:scale-110 hover:rotate-3 hover:shadow-primary/50 hover:shadow-2xl">
+                <img 
+                  src={user.avatar || "/placeholder.svg"} 
+                  alt={user.name} 
+                  className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110" 
+                />
+              </div>
+              {/* 3D Glow effect */}
+              <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+              {/* Floating particles effect */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full animate-ping opacity-75"></div>
+              <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-secondary rounded-full animate-ping opacity-75" style={{ animationDelay: '0.5s' }}></div>
             </div>
 
             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
@@ -211,24 +225,24 @@ export function ProfileContent({ user, userPosts, userId }: ProfileContentProps)
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition">
-                <p className="text-2xl md:text-3xl font-bold text-primary">{localFollowers}</p>
+              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transform">
+                <p className="text-2xl md:text-3xl font-bold text-primary transform transition-transform duration-300 hover:scale-110">{localFollowers}</p>
                 <p className="text-xs md:text-sm text-muted-foreground mt-1">Followers</p>
               </div>
-              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition">
-                <p className="text-2xl md:text-3xl font-bold text-secondary">{user.following}</p>
+              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/20 hover:-translate-y-1 transform">
+                <p className="text-2xl md:text-3xl font-bold text-secondary transform transition-transform duration-300 hover:scale-110">{user.following}</p>
                 <p className="text-xs md:text-sm text-muted-foreground mt-1">Following</p>
               </div>
-              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition">
-                <p className="text-2xl md:text-3xl font-bold text-accent">{user.postsCount}</p>
+              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent/20 hover:-translate-y-1 transform">
+                <p className="text-2xl md:text-3xl font-bold text-accent transform transition-transform duration-300 hover:scale-110">{user.postsCount}</p>
                 <p className="text-xs md:text-sm text-muted-foreground mt-1">Posts</p>
               </div>
-              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition">
-                <p className="text-2xl md:text-3xl font-bold text-primary/80">Lvl {user.level}</p>
+              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transform">
+                <p className="text-2xl md:text-3xl font-bold text-primary/80 transform transition-transform duration-300 hover:scale-110">Lvl {user.level}</p>
                 <p className="text-xs md:text-sm text-muted-foreground mt-1">Level</p>
               </div>
-              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition">
-                <p className="text-2xl md:text-3xl font-bold text-secondary/80">{user.xp}</p>
+              <div className="bg-card/50 border border-border/30 rounded-lg p-4 text-center backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/20 hover:-translate-y-1 transform">
+                <p className="text-2xl md:text-3xl font-bold text-secondary/80 transform transition-transform duration-300 hover:scale-110">{user.xp}</p>
                 <p className="text-xs md:text-sm text-muted-foreground mt-1">XP</p>
               </div>
             </div>
@@ -238,9 +252,9 @@ export function ProfileContent({ user, userPosts, userId }: ProfileContentProps)
                 <Button
                   onClick={handleFollow}
                   disabled={!isAuthenticated || isFollowLoading}
-                  className={`font-medium transition-all ${
+                  className={`font-medium transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 ${
                     isFollowing
-                      ? "bg-muted/50 hover:bg-muted/70 text-foreground"
+                      ? "bg-muted/50 hover:bg-muted/70 text-foreground hover:shadow-lg"
                       : "bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50"
                   }`}
                 >
@@ -252,12 +266,19 @@ export function ProfileContent({ user, userPosts, userId }: ProfileContentProps)
                     "Follow"
                   )}
                 </Button>
-                <Button variant="outline" onClick={handleShare} className="gap-2 border-border hover:bg-muted/50 bg-transparent">
+                <Button 
+                  variant="outline" 
+                  onClick={handleShare} 
+                  className="gap-2 border-border hover:bg-muted/50 bg-transparent transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg"
+                >
                   <Share size={18} />
                   Share
                 </Button>
                 <Link href={`/messages?user=${userId}`}>
-                  <Button variant="outline" className="gap-2 border-border hover:bg-muted/50 bg-transparent">
+                  <Button 
+                    variant="outline" 
+                    className="gap-2 border-border hover:bg-muted/50 bg-transparent transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg"
+                  >
                     <MessageCircle size={18} />
                     Message
                   </Button>
