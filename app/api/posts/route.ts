@@ -14,10 +14,21 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
-    const where: Record<string, unknown> = {}
+    const where: Record<string, unknown> = {
+      visibility: "public", // Only show public posts by default
+    }
 
     if (userId) {
       where.authorId = userId
+      // If viewing own posts, show all visibility levels
+      const authHeader = request.headers.get("authorization")
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.substring(7)
+        const decoded = await verifyToken(token)
+        if (decoded && decoded.userId === userId) {
+          delete where.visibility
+        }
+      }
     }
 
     if (type) {

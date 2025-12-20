@@ -1508,18 +1508,29 @@ export default function DMPage() {
                                 onClick={async () => {
                                   // Send GIF as image attachment
                                   try {
-                                    const response = await fetch(gifUrl)
-                                    const blob = await response.blob()
-                                    const file = new File([blob], `gif_${Date.now()}.gif`, { type: 'image/gif' })
-                                    await handleSendMessage("", [file])
                                     setShowGifPicker(false)
+                                    // Use the GIF URL directly instead of fetching
+                                    const gifBlob = await fetch(gifUrl, { mode: 'cors' }).then(r => r.blob()).catch(() => null)
+                                    if (!gifBlob) {
+                                      // Fallback: send as URL in message content
+                                      await handleSendMessage(`[GIF] ${gifUrl}`, [])
+                                      return
+                                    }
+                                    const file = new File([gifBlob], `gif_${Date.now()}.gif`, { type: 'image/gif' })
+                                    await handleSendMessage("", [file])
                                   } catch (error) {
                                     console.error("Failed to send GIF:", error)
+                                    // Fallback: send URL as text
+                                    try {
+                                      await handleSendMessage(`[GIF] ${gifUrl}`, [])
+                                    } catch (fallbackError) {
+                                      alert("Failed to send GIF. Please try again.")
+                                    }
                                   }
                                 }}
                                 className="relative aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
                               >
-                                <img src={gifUrl} alt={`GIF ${i + 1}`} className="w-full h-full object-cover" />
+                                <img src={gifUrl} alt={`GIF ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                               </button>
                             ))}
                           </div>

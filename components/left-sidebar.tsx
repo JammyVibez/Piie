@@ -25,6 +25,7 @@ import {
   TrendingUp,
   Sparkles,
   ChevronRight,
+  Video,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -51,6 +52,7 @@ const mainNavItems: NavItem[] = [
 
 const socialItems: NavItem[] = [
   { icon: Users, label: "Communities", href: "/communities" },
+  { icon: Video, label: "Rooms", href: "/rooms" },
   { icon: TrendingUp, label: "Trending", href: "/trending" },
   { icon: Trophy, label: "Leaderboards", href: "/leaderboard" },
   { icon: Flame, label: "Challenges", href: "/challenges" },

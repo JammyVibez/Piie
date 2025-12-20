@@ -22,6 +22,7 @@ import {
   Eye,
   TrendingUp,
   Zap,
+  GitFork,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { FusionPost, FusionLayer } from "@/lib/types"
@@ -106,6 +107,9 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likeCount, setLikeCount] = useState(fusionPost.likes || 0)
   const [viewCount, setViewCount] = useState(Math.floor(Math.random() * 1000))
+  const [forkCount, setForkCount] = useState(fusionPost.forkCount || 0)
+  const [commentCount, setCommentCount] = useState(0)
+  const [isForking, setIsForking] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [translateX, setTranslateX] = useState(0)
@@ -134,6 +138,55 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
 
   const currentLayer = allLayers[currentLayerIndex]
   const totalLayers = allLayers.length
+
+  // Load real-time data on mount
+  useEffect(() => {
+    const loadRealtimeData = async () => {
+      const token = localStorage.getItem("auth_token")
+      if (!token) return
+
+      try {
+        // Load likes, comments, fork count
+        const [likeRes, commentRes] = await Promise.all([
+          fetch(`/api/fusion/${fusionPost.id}/like`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => null),
+          fetch(`/api/posts/${fusionPost.id}/comments?limit=1`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => null),
+        ])
+
+        if (likeRes?.ok) {
+          const likeData = await likeRes.json()
+          if (likeData.success) {
+            setLikeCount(likeData.likeCount || 0)
+            setIsLiked(likeData.liked || false)
+          }
+        }
+
+        if (commentRes?.ok) {
+          const commentData = await commentRes.json()
+          if (commentData.success) {
+            setCommentCount(commentData.data?.total || 0)
+          }
+        }
+
+        // Check if bookmarked
+        const bookmarkRes = await fetch(`/api/bookmarks/${fusionPost.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).catch(() => null)
+        
+        if (bookmarkRes?.ok) {
+          const bookmarkData = await bookmarkRes.json()
+          setIsBookmarked(bookmarkData.isBookmarked || false)
+        }
+      } catch (error) {
+        console.error("Failed to load real-time data:", error)
+      }
+    }
+
+    loadRealtimeData()
+  }, [fusionPost.id])
 
   useEffect(() => {
     if (isAutoPlaying && totalLayers > 1) {
@@ -235,6 +288,7 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
       const data = await response.json()
       if (data.success) {
         setLikeCount(data.likeCount || likeCount)
+        setIsLiked(data.liked !== undefined ? data.liked : newLikedState)
       }
     } catch (error) {
       console.error("Error liking fusion:", error)
@@ -295,15 +349,78 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
     })
   }
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (navigator.share) {
-      navigator.share({
-        title: fusionPost.title,
-        text: fusionPost.seedContent,
-        url: `${window.location.origin}/fusion/${fusionPost.id}`,
-      })
+      try {
+        await navigator.share({
+          title: fusionPost.title,
+          text: fusionPost.seedContent,
+          url: `${window.location.origin}/fusion/${fusionPost.id}`,
+        })
+        // Track share
+        const token = localStorage.getItem("auth_token")
+        if (token) {
+          fetch(`/api/fusion/${fusionPost.id}/share`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => {})
+        }
+      } catch (error) {
+        // User cancelled or error
+      }
     } else {
       handleCopyLink()
+    }
+  }
+
+  const handleFork = async () => {
+    const token = localStorage.getItem("auth_token")
+    if (!token) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to fork this fusion",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsForking(true)
+    try {
+      const response = await fetch(`/api/fusion/${fusionPost.id}/fork`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: `${fusionPost.title} (Fork)`,
+          seedContent: fusionPost.seedContent,
+        }),
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        setForkCount(prev => prev + 1)
+        toast({
+          title: "Fusion Forked!",
+          description: "You've created a fork of this fusion",
+        })
+        // Navigate to the new fork
+        if (result.data?.id) {
+          window.location.href = `/fusion/${result.data.id}`
+        }
+      } else {
+        throw new Error(result.error || "Failed to fork")
+      }
+    } catch (error) {
+      console.error("Error forking fusion:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fork fusion",
+        variant: "destructive",
+      })
+    } finally {
+      setIsForking(false)
     }
   }
 
@@ -320,10 +437,10 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
           <Sparkles className="w-3 h-3 mr-1" />
           FUSED
         </Badge>
-        {fusionPost.forkCount > 0 && (
+        {forkCount > 0 && (
           <Badge variant="secondary" className="backdrop-blur-sm bg-background/80">
             <TrendingUp className="w-3 h-3 mr-1" />
-            {fusionPost.forkCount} Forks
+            {forkCount} Forks
           </Badge>
         )}
       </div>
@@ -545,6 +662,18 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
               }}
             >
               <MessageCircle className="w-5 h-5" />
+              {commentCount > 0 && <span className="text-sm">{commentCount}</span>}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFork}
+              disabled={isForking}
+              className="gap-2 hover:scale-110 transition-transform"
+            >
+              <GitFork className="w-5 h-5" />
+              {forkCount > 0 && <span className="text-sm">{forkCount}</span>}
             </Button>
 
             <Button
@@ -600,8 +729,8 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
       <CommentModal
         isOpen={showCommentModal}
         onClose={() => setShowCommentModal(false)}
-        onSubmit={(comment) => {
-          console.log("Comment submitted:", comment)
+        onSubmit={async (comment) => {
+          setCommentCount(prev => prev + 1)
           toast({
             title: "Comment posted!",
             description: "Your comment has been added to this fusion.",

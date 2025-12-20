@@ -56,30 +56,59 @@ export async function GET(request: NextRequest) {
       prisma.fusionPost.count({ where }),
     ])
 
+    // Get like counts for all fusion posts
+    const fusionIds = fusionPosts.map(fp => fp.id)
+    const seedLayers = await prisma.fusionLayer.findMany({
+      where: {
+        fusionPostId: { in: fusionIds },
+        layerOrder: 0,
+      },
+      select: { id: true, fusionPostId: true },
+    })
+
+    const seedLayerIds = seedLayers.map(sl => sl.id)
+    const reactions = await prisma.fusionReaction.findMany({
+      where: {
+        layerId: { in: seedLayerIds },
+        type: 'like',
+      },
+      select: { layerId: true },
+    })
+
+    const likeCountMap = new Map<string, number>()
+    seedLayers.forEach(sl => {
+      const count = reactions.filter(r => r.layerId === sl.id).length
+      likeCountMap.set(sl.fusionPostId, count)
+    })
+
     const formattedPosts = fusionPosts.map((fp) => ({
       id: fp.id,
-      author: {
+      ownerId: fp.ownerId,
+      owner: {
         id: fp.owner.id,
         name: fp.owner.name,
         username: fp.owner.username,
         avatar: fp.owner.avatar,
       },
       title: fp.title,
-      content: {
-        text: fp.seedContent,
-        layers: fp.layers.map((layer) => ({
-          id: layer.id,
-          type: layer.type.toLowerCase(),
-          content: layer.content,
-          src: layer.mediaUrl,
-          alt: layer.content,
-          author: layer.author,
-          positionX: layer.positionX,
-          positionY: layer.positionY,
-        })),
-      },
+      seedContent: fp.seedContent,
       seedMediaUrl: fp.seedMediaUrl,
       seedType: fp.seedType,
+      layers: fp.layers.map((layer) => ({
+        id: layer.id,
+        type: layer.type,
+        content: layer.content,
+        mediaUrl: layer.mediaUrl,
+        author: layer.author,
+        authorId: layer.authorId,
+        fusionPostId: layer.fusionPostId,
+        layerOrder: layer.layerOrder,
+        positionX: layer.positionX,
+        positionY: layer.positionY,
+        likes: layer.likes,
+        isApproved: layer.isApproved,
+        createdAt: layer.createdAt,
+      })),
       privacy: fp.privacy,
       currentState: fp.currentState,
       viewMode: fp.viewMode,
@@ -88,7 +117,7 @@ export async function GET(request: NextRequest) {
       forkCount: fp.forkCount,
       createdAt: fp.createdAt,
       updatedAt: fp.updatedAt,
-      likes: 0,
+      likes: likeCountMap.get(fp.id) || 0,
       comments: [],
     }))
 

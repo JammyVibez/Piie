@@ -73,11 +73,10 @@ export async function POST(
       data: { likes: { increment: 1 } },
     })
 
+    // Count likes on seed layer
     const totalLikes = await prisma.fusionReaction.count({
       where: {
-        layer: {
-          fusionPostId: fusionId,
-        },
+        layerId: seedLayer.id,
         type: "like",
       },
     })
@@ -136,14 +135,22 @@ export async function DELETE(
       })
     }
 
-    const totalLikes = await prisma.fusionReaction.count({
+    // Count likes on seed layer (layerOrder 0)
+    const seedLayer = await prisma.fusionLayer.findFirst({
       where: {
-        layer: {
-          fusionPostId: fusionId,
-        },
-        type: "like",
+        fusionPostId: fusionId,
+        layerOrder: 0,
       },
     })
+
+    const totalLikes = seedLayer 
+      ? await prisma.fusionReaction.count({
+          where: {
+            layerId: seedLayer.id,
+            type: "like",
+          },
+        })
+      : 0
 
     return NextResponse.json({
       success: true,
