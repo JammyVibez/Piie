@@ -84,7 +84,7 @@ export default function RegisterPage() {
     })
 
     if (result.success) {
-      router.push("/")
+      router.push("/auth/onboarding")
     } else {
       setError(result.error || "Registration failed")
     }

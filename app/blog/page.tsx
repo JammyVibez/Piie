@@ -10,7 +10,7 @@ const blogPosts = [
   {
     id: "v1.2.0-release",
     title: "P!!E v1.2.0 - New Features & Improvements",
-    date: "2024-01-09",
+    date: "2025-01-09",
     author: "P!!E Team",
     excerpt: "We're excited to announce P!!E v1.2.0 with Fusion Posts, Audio Rooms, and more!",
     tags: ["Release", "Features"],
@@ -49,7 +49,7 @@ const blogPosts = [
   {
     id: "community-guidelines",
     title: "Community Guidelines & Best Practices",
-    date: "2024-01-05",
+    date: "2025-01-05",
     author: "P!!E Team",
     excerpt: "Learn how to create a positive and engaging community on P!!E",
     tags: ["Community", "Guidelines"],

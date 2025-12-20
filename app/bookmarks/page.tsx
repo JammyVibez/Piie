@@ -104,7 +104,7 @@ export default function BookmarksPage() {
 
   const handleRemoveBookmark = async (postId: string) => {
     try {
-      // await fetch(`/api/bookmarks/${postId}`, { method: "DELETE" })
+      await fetch(`/api/bookmarks/${postId}`, { method: "DELETE" })
       setBookmarkedPosts((prev) => prev.filter((p) => p.id !== postId))
     } catch (error) {
       console.error("Failed to remove bookmark:", error)
@@ -113,10 +113,10 @@ export default function BookmarksPage() {
 
   const handleBulkRemove = async () => {
     try {
-      // await fetch("/api/bookmarks/bulk-delete", {
-      //   method: "POST",
-      //   body: JSON.stringify({ ids: selectedPosts })
-      // })
+      await fetch("/api/bookmarks/bulk-delete", {
+        method: "POST",
+        body: JSON.stringify({ ids: selectedPosts })
+      })
       setBookmarkedPosts((prev) => prev.filter((p) => !selectedPosts.includes(p.id)))
       setSelectedPosts([])
       setIsSelecting(false)

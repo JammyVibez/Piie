@@ -1090,7 +1090,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground">
                     Contact support at{" "}
                     <a href="mailto:support@peakit.com" className="text-primary hover:underline">
-                      support@peakit.com
+                      support@p!!e.com
                     </a>
                   </p>
                 </div>
