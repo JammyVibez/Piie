@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, ShoppingCart, Star, Sparkles, Crown, Zap, Heart, Coins } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -75,23 +75,105 @@ const rarityColors = {
 }
 
 export default function ShopPage() {
-  const { user } = useAuth()
+  const { user, token, refreshUser } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [userCoins, setUserCoins] = useState(user?.xp || 0)
+  const [purchasedItems, setPurchasedItems] = useState<string[]>([])
+  const [isPurchasing, setIsPurchasing] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load purchased items
+  useEffect(() => {
+    const loadPurchasedItems = async () => {
+      if (!token) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch('/api/shop/items', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        const result = await response.json()
+        if (result.success) {
+          setPurchasedItems(result.data.purchasedItems)
+        }
+      } catch (error) {
+        console.error('Failed to load purchased items:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadPurchasedItems()
+  }, [token])
+
+  // Update coins when user changes
+  useEffect(() => {
+    if (user) {
+      setUserCoins(user.xp || 0)
+    }
+  }, [user])
 
   const filteredItems = selectedCategory === "all" 
     ? shopItems 
     : shopItems.filter(item => item.category === selectedCategory)
 
-  const handlePurchase = (item: typeof shopItems[0]) => {
+  const handlePurchase = async (item: typeof shopItems[0]) => {
+    if (!token || !user) {
+      alert("Please login to purchase items")
+      return
+    }
+
     if (userCoins < item.price) {
-      alert("Not enough coins!")
+      alert(`Not enough coins! You need ${item.price} coins but only have ${userCoins}`)
+      return
+    }
+
+    if (purchasedItems.includes(item.id)) {
+      alert("You already own this item!")
       return
     }
     
-    if (confirm(`Purchase ${item.name} for ${item.price} coins?`)) {
-      setUserCoins(prev => prev - item.price)
-      alert(`Successfully purchased ${item.name}!`)
+    if (!confirm(`Purchase ${item.name} for ${item.price} coins?`)) {
+      return
+    }
+
+    setIsPurchasing(item.id)
+    try {
+      const response = await fetch('/api/shop/purchase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          itemId: item.id,
+          itemName: item.name,
+          price: item.price,
+          category: item.category
+        })
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        setUserCoins(result.data.newBalance)
+        setPurchasedItems(prev => [...prev, item.id])
+        alert(`Successfully purchased ${item.name}!`)
+        // Refresh user data
+        if (refreshUser) {
+          await refreshUser()
+        }
+      } else {
+        alert(result.error || 'Failed to purchase item')
+      }
+    } catch (error) {
+      console.error('Purchase error:', error)
+      alert('Failed to purchase item. Please try again.')
+    } finally {
+      setIsPurchasing(null)
     }
   }
 
@@ -177,9 +259,15 @@ export default function ShopPage() {
               <Button 
                 onClick={() => handlePurchase(item)}
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-lg"
-                disabled={userCoins < item.price}
+                disabled={userCoins < item.price || purchasedItems.includes(item.id) || isPurchasing === item.id}
               >
-                {userCoins < item.price ? "Not Enough Coins" : "Purchase"}
+                {isPurchasing === item.id 
+                  ? "Processing..." 
+                  : purchasedItems.includes(item.id)
+                  ? "Owned"
+                  : userCoins < item.price 
+                  ? "Not Enough Coins" 
+                  : "Purchase"}
               </Button>
             </Card>
           ))}

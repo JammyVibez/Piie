@@ -60,8 +60,42 @@ export function ProfileContent({ user, userPosts, userId }: ProfileContentProps)
   const [isFollowing, setIsFollowing] = useState(false)
   const [localFollowers, setLocalFollowers] = useState(user.followers)
   const [isFollowLoading, setIsFollowLoading] = useState(false)
+  const [purchasedItems, setPurchasedItems] = useState<any[]>([])
 
   const isCurrentUser = currentUser?.id === userId
+
+  // Load purchased items
+  useEffect(() => {
+    const loadPurchasedItems = async () => {
+      if (!token || userId !== currentUser?.id) return
+
+      try {
+        const response = await fetch('/api/shop/items', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        const result = await response.json()
+        if (result.success && result.data.purchasedItems) {
+          // Get full item details
+          const shopItems = [
+            { id: "1", name: "XP Booster", icon: "⚡", rarity: "rare" },
+            { id: "2", name: "Premium Badge", icon: "👑", rarity: "epic" },
+            { id: "3", name: "Custom Theme", icon: "🎨", rarity: "rare" },
+            { id: "4", name: "Profile Frame", icon: "✨", rarity: "legendary" },
+            { id: "5", name: "Story Boost", icon: "🚀", rarity: "common" },
+            { id: "6", name: "Verified Badge", icon: "✓", rarity: "legendary" },
+          ]
+          const purchased = shopItems.filter(item => result.data.purchasedItems.includes(item.id))
+          setPurchasedItems(purchased)
+        }
+      } catch (error) {
+        console.error('Failed to load purchased items:', error)
+      }
+    }
+
+    loadPurchasedItems()
+  }, [token, userId, currentUser])
 
   // Fetch follow status on mount
   useEffect(() => {
@@ -287,6 +321,27 @@ export function ProfileContent({ user, userPosts, userId }: ProfileContentProps)
             )}
           </div>
         </div>
+
+        {/* Purchased Items Section */}
+        {isCurrentUser && purchasedItems.length > 0 && (
+          <div className="mt-6 bg-card/50 border border-border/30 rounded-lg p-4 backdrop-blur-sm">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+              <Award size={16} />
+              Purchased Items
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {purchasedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="text-xs font-medium text-foreground">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="max-w-6xl mx-auto px-4">

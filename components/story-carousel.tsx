@@ -175,12 +175,13 @@ export function StoryCarousel() {
     }
   }
 
-  const handleStoryClick = (storyId: string) => {
-    if (storyId === "add") {
+  const handleStoryClick = (storyGroup: Story) => {
+    if (storyGroup.user.id === user?.id && storyGroup.stories.length === 0) {
       setShowCreateModal(true)
       return
     }
-    console.log(`Clicked on story group: ${storyId}`);
+    // Navigate to story viewer
+    window.location.href = `/status/${storyGroup.user.id}`
   }
 
 
@@ -317,7 +318,7 @@ export function StoryCarousel() {
         {stories.map((storyGroup) => (
           <button
             key={storyGroup.user.id}
-            onClick={() => handleStoryClick(storyGroup.user.id)}
+            onClick={() => handleStoryClick(storyGroup)}
             className="flex flex-col items-center gap-1.5 flex-shrink-0 group/story"
           >
             <div className={`relative p-0.5 rounded-full ${storyGroup.stories.some(s => s.createdAt > new Date(Date.now() - 24 * 60 * 60 * 1000)) ? "bg-gradient-to-br from-primary via-secondary to-accent" : "bg-muted/50"}`}>

@@ -4,26 +4,84 @@ import { verifyToken } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    let userId: string | undefined
+    let currentUserId: string | undefined
+    const { searchParams } = new URL(request.url)
+    const targetUserId = searchParams.get('userId')
 
     const authHeader = request.headers.get('authorization')
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7)
       const decoded = await verifyToken(token)
       if (decoded) {
-        userId = decoded.userId
+        currentUserId = decoded.userId
       }
     }
 
+    // If userId query param is provided, get stories for that specific user
+    if (targetUserId) {
+      const stories = await prisma.post.findMany({
+        where: {
+          authorId: targetUserId,
+          postType: 'media',
+          visibility: 'public',
+          createdAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              avatar: true
+            }
+          },
+          _count: {
+            select: {
+              likedBy: true,
+              comments: true
+            }
+          }
+        }
+      })
+
+      if (stories.length === 0) {
+        return NextResponse.json({
+          success: true,
+          data: []
+        })
+      }
+
+      const user = stories[0].author
+      const formattedStories = stories.map(story => ({
+        id: story.id,
+        content: story.description || '',
+        image: story.images?.[0] || story.video || null,
+        createdAt: story.createdAt.toISOString(),
+        views: story.views || 0,
+        likes: story._count.likedBy || 0
+      }))
+
+      return NextResponse.json({
+        success: true,
+        data: [{
+          user,
+          statuses: formattedStories
+        }]
+      })
+    }
+
     // Get stories from followed users and own stories
-    const where = userId ? {
+    const where = currentUserId ? {
       OR: [
-        { authorId: userId },
+        { authorId: currentUserId },
         { 
           author: {
             followers: {
               some: {
-                followerId: userId
+                followerId: currentUserId
               }
             }
           }

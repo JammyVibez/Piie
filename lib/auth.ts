@@ -245,9 +245,14 @@ export async function deleteSession(refreshToken: string): Promise<void> {
 }
 
 export async function getFollowCounts(userId: string): Promise<{ followers: number; following: number }> {
-  const [followers, following] = await Promise.all([
-    prisma.follow.count({ where: { followingId: userId } }),
-    prisma.follow.count({ where: { followerId: userId } }),
-  ])
-  return { followers, following }
+  try {
+    const [followers, following] = await Promise.all([
+      prisma.follow.count({ where: { followingId: userId } }).catch(() => 0),
+      prisma.follow.count({ where: { followerId: userId } }).catch(() => 0),
+    ])
+    return { followers, following }
+  } catch (error) {
+    console.error("Error getting follow counts:", error)
+    return { followers: 0, following: 0 }
+  }
 }
