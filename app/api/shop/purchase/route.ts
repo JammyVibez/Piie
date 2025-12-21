@@ -17,51 +17,62 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { itemId, itemName, price, category } = body
+    const { itemId } = body
 
-    if (!itemId || !itemName || !price) {
-      return NextResponse.json({ success: false, error: "Item details required" }, { status: 400 })
+    if (!itemId) {
+      return NextResponse.json({ success: false, error: "Item ID required" }, { status: 400 })
     }
 
-    // Get user with current XP (using XP as coins)
+    // Get shop item
+    const shopItem = await prisma.shopItem.findUnique({
+      where: { id: itemId }
+    })
+
+    if (!shopItem) {
+      return NextResponse.json({ success: false, error: "Item not found" }, { status: 404 })
+    }
+
+    if (!shopItem.isActive) {
+      return NextResponse.json({ success: false, error: "Item is not available" }, { status: 400 })
+    }
+
+    // Check stock
+    if (shopItem.stock !== null && shopItem.stock <= 0) {
+      return NextResponse.json({ success: false, error: "Item is out of stock" }, { status: 400 })
+    }
+
+    // Get user with current coins
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, xp: true }
+      select: { id: true, coins: true, xp: true }
     })
 
     if (!user) {
       return NextResponse.json({ success: false, error: "User not found" }, { status: 404 })
     }
 
-    // Check if user has enough coins (XP)
-    if (user.xp < price) {
+    // Use coins if available, otherwise use xp
+    const userBalance = user.coins || user.xp || 0
+
+    // Check if user has enough balance
+    if (userBalance < shopItem.price) {
       return NextResponse.json({ 
         success: false, 
-        error: "Not enough coins. You need " + price + " coins but only have " + user.xp 
+        error: `Not enough coins. You need ${shopItem.price} coins but only have ${userBalance}` 
       }, { status: 400 })
     }
 
-    // Get or create user settings to store purchases
-    let userSettings = await prisma.userSettings.findUnique({
-      where: { userId: decoded.userId }
+    // Check if already purchased
+    const existingPurchase = await prisma.userPurchase.findUnique({
+      where: {
+        userId_shopItemId: {
+          userId: decoded.userId,
+          shopItemId: itemId
+        }
+      }
     })
 
-    if (!userSettings) {
-      userSettings = await prisma.userSettings.create({
-        data: { userId: decoded.userId }
-      })
-    }
-
-    // Check purchases stored in chatWallpaper field (repurposing it as JSON storage)
-    let purchases: any[] = []
-    try {
-      purchases = userSettings.chatWallpaper ? JSON.parse(userSettings.chatWallpaper) : []
-    } catch {
-      purchases = []
-    }
-
-    // Check if item already purchased
-    if (purchases.some((p: any) => p.itemId === itemId)) {
+    if (existingPurchase) {
       return NextResponse.json({ 
         success: false, 
         error: "You already own this item" 
@@ -69,32 +80,52 @@ export async function POST(request: NextRequest) {
     }
 
     // Deduct coins and save purchase
-    const newPurchase = {
-      itemId,
-      itemName,
-      price,
-      category: category || 'other',
-      purchasedAt: new Date().toISOString()
-    }
+    await prisma.$transaction(async (tx) => {
+      // Update user balance
+      if (user.coins !== null && user.coins >= shopItem.price) {
+        await tx.user.update({
+          where: { id: decoded.userId },
+          data: { coins: { decrement: shopItem.price } }
+        })
+      } else {
+        // Use xp if coins not available
+        await tx.user.update({
+          where: { id: decoded.userId },
+          data: { xp: { decrement: shopItem.price } }
+        })
+      }
 
-    purchases.push(newPurchase)
-
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: decoded.userId },
-        data: { xp: { decrement: price } }
-      }),
-      prisma.userSettings.update({
-        where: { userId: decoded.userId },
-        data: { chatWallpaper: JSON.stringify(purchases) }
+      // Create purchase record
+      await tx.userPurchase.create({
+        data: {
+          userId: decoded.userId,
+          shopItemId: itemId,
+          price: shopItem.price
+        }
       })
-    ])
+
+      // Update stock if limited
+      if (shopItem.stock !== null) {
+        await tx.shopItem.update({
+          where: { id: itemId },
+          data: { stock: { decrement: 1 } }
+        })
+      }
+    })
+
+    // Get updated user balance
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { coins: true, xp: true }
+    })
+
+    const newBalance = (updatedUser?.coins || updatedUser?.xp || 0)
 
     return NextResponse.json({
       success: true,
       data: {
-        message: `Successfully purchased ${itemName}!`,
-        newBalance: user.xp - price
+        message: `Successfully purchased ${shopItem.name}!`,
+        newBalance
       }
     })
   } catch (error) {
@@ -105,4 +136,3 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 }
-

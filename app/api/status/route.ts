@@ -48,9 +48,30 @@ export async function GET(request: NextRequest) {
       })
 
       if (stories.length === 0) {
+        // Still return user info even if no stories
+        const user = await prisma.user.findUnique({
+          where: { id: targetUserId },
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            avatar: true
+          }
+        })
+        
+        if (!user) {
+          return NextResponse.json({
+            success: false,
+            error: "User not found"
+          }, { status: 404 })
+        }
+        
         return NextResponse.json({
           success: true,
-          data: []
+          data: [{
+            user,
+            statuses: []
+          }]
         })
       }
 

@@ -15,28 +15,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get user's purchased items if authenticated
-    let purchasedItems: string[] = []
-    if (userId) {
-      const userSettings = await prisma.userSettings.findUnique({
-        where: { userId },
-        select: { chatWallpaper: true }
-      })
+    // Get all active shop items
+    const items = await prisma.shopItem.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" }
+    })
 
-      if (userSettings?.chatWallpaper) {
-        try {
-          const purchases = JSON.parse(userSettings.chatWallpaper)
-          purchasedItems = purchases.map((p: any) => p.itemId)
-        } catch {
-          purchasedItems = []
-        }
-      }
+    // Get user's purchased items if authenticated
+    let purchasedItemIds: string[] = []
+    if (userId) {
+      const purchases = await prisma.userPurchase.findMany({
+        where: { userId },
+        select: { shopItemId: true }
+      })
+      purchasedItemIds = purchases.map(p => p.shopItemId)
     }
 
     return NextResponse.json({
       success: true,
       data: {
-        purchasedItems
+        items,
+        purchasedItems: purchasedItemIds
       }
     })
   } catch (error) {
@@ -44,4 +43,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to fetch items" }, { status: 500 })
   }
 }
-

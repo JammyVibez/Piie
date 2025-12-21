@@ -41,9 +41,24 @@ export default function StatusPage({ params }: { params: { userId: string } }) {
         const response = await fetch(`/api/status?userId=${params.userId}`, { headers })
         const data = await response.json()
 
-        if (data.success && data.data.length > 0) {
-          setUser(data.data[0].user)
-          setStatuses(data.data[0].statuses)
+        if (data.success) {
+          if (data.data && data.data.length > 0 && data.data[0].user && data.data[0].statuses) {
+            setUser(data.data[0].user)
+            setStatuses(data.data[0].statuses)
+          } else {
+            // Try to get user info even if no statuses
+            const userResponse = await fetch(`/api/users/${params.userId}`, { headers })
+            const userData = await userResponse.json()
+            if (userData.success && userData.data) {
+              setUser({
+                id: userData.data.id,
+                name: userData.data.name,
+                username: userData.data.username,
+                avatar: userData.data.avatar
+              })
+            }
+            setStatuses([])
+          }
         }
       } catch (error) {
         console.error("Failed to fetch statuses:", error)

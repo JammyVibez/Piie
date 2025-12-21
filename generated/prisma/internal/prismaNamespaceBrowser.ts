@@ -110,7 +110,9 @@ export const ModelName = {
   ThreadShare: 'ThreadShare',
   CommunityMessage: 'CommunityMessage',
   CommunityMessageReaction: 'CommunityMessageReaction',
-  UserOnboarding: 'UserOnboarding'
+  UserOnboarding: 'UserOnboarding',
+  ShopItem: 'ShopItem',
+  UserPurchase: 'UserPurchase'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1014,6 +1016,34 @@ export const UserOnboardingScalarFieldEnum = {
 } as const
 
 export type UserOnboardingScalarFieldEnum = (typeof UserOnboardingScalarFieldEnum)[keyof typeof UserOnboardingScalarFieldEnum]
+
+
+export const ShopItemScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  price: 'price',
+  category: 'category',
+  icon: 'icon',
+  rarity: 'rarity',
+  isActive: 'isActive',
+  stock: 'stock',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ShopItemScalarFieldEnum = (typeof ShopItemScalarFieldEnum)[keyof typeof ShopItemScalarFieldEnum]
+
+
+export const UserPurchaseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  shopItemId: 'shopItemId',
+  price: 'price',
+  purchasedAt: 'purchasedAt'
+} as const
+
+export type UserPurchaseScalarFieldEnum = (typeof UserPurchaseScalarFieldEnum)[keyof typeof UserPurchaseScalarFieldEnum]
 
 
 export const SortOrder = {

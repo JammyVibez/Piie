@@ -29,6 +29,7 @@ import type { FusionPost, FusionLayer } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { CommentModal } from "@/components/comment-modal"
+import { realtimeManager } from "@/lib/realtime/subscriptions"
 
 interface FusionPostCardProps {
   fusionPost: FusionPost
@@ -103,6 +104,20 @@ const formatRelativeTime = (dateString: string): string => {
 export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) {
   const { toast } = useToast()
   const [currentLayerIndex, setCurrentLayerIndex] = useState(0)
+  // Local editable copy of layers so added layers appear immediately
+  const [localLayers, setLocalLayers] = useState<FusionLayer[]>(fusionPost.layers || [])
+  // keep localLayers in sync if parent updates the post
+  useEffect(() => {
+    setLocalLayers(fusionPost.layers || [])
+  }, [fusionPost.layers])
+  // Add Layer modal and form state
+  const [showAddLayerModal, setShowAddLayerModal] = useState(false)
+  const [newLayerType, setNewLayerType] = useState<string>("text")
+  const [newLayerContent, setNewLayerContent] = useState<string>("")
+  const [newLayerMediaUrl, setNewLayerMediaUrl] = useState<string>("")
+  const [isAddingLayer, setIsAddingLayer] = useState(false)
+  // 3D profile tilt state
+  const [tiltStyle, setTiltStyle] = useState<{ transform: string }>({ transform: "perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)" })
   const [isLiked, setIsLiked] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likeCount, setLikeCount] = useState(fusionPost.likes || 0)
@@ -116,8 +131,24 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
   const [showLayerInfo, setShowLayerInfo] = useState(false)
   const [showCommentModal, setShowCommentModal] = useState(false)
+  // Card tilt/parallax state
+  const [cardTiltStyle, setCardTiltStyle] = useState<{ transform?: string }>({})
+  // small flag to re-trigger layer transition animation
+  const [layerAnimKey, setLayerAnimKey] = useState(0)
   const cardRef = useRef<HTMLDivElement>(null)
   const autoPlayInterval = useRef<NodeJS.Timeout>()
+  // card mouse handlers for parallax
+  const handleCardMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5 // -0.5..0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    const rotateY = x * 10
+    const rotateX = -y * 6
+    const translateZ = 6 + Math.abs(x + y) * 6
+    setCardTiltStyle({ transform: `perspective(900px) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)` })
+  }
+  const handleCardMouseLeave = () => setCardTiltStyle({})
 
   const allLayers = [
     {
@@ -133,8 +164,95 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
       isApproved: true,
       createdAt: fusionPost.createdAt,
     } as FusionLayer,
-    ...(fusionPost.layers || []),
+    ...(localLayers || []),
   ]
+  // bump animation key whenever layer index changes so we can animate content
+  useEffect(() => setLayerAnimKey(k => k + 1), [currentLayerIndex])
+
+  // Helper to submit new layer (fallback internal flow)
+  const submitNewLayer = async () => {
+    const token = localStorage.getItem("auth_token")
+    if (!token) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to add a layer",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsAddingLayer(true)
+    try {
+      const body = {
+        type: newLayerType,
+        content: newLayerContent,
+        mediaUrl: newLayerMediaUrl || null,
+      }
+      const res = await fetch(`/api/fusion/${fusionPost.id}/layers`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to add layer")
+      }
+
+      // Use returned layer if available, otherwise build a simple layer object
+      const addedLayer: FusionLayer = data.data || {
+        id: data.data?.id || `local-${Date.now()}`,
+        type: newLayerType as any,
+        content: newLayerContent,
+        mediaUrl: newLayerMediaUrl,
+        author: { name: "You", avatar: undefined },
+        authorId: "me",
+        fusionPostId: fusionPost.id,
+        layerOrder: (localLayers.length || 0) + 1,
+        likes: 0,
+        isApproved: true,
+        createdAt: new Date().toISOString(),
+      }
+
+      setLocalLayers(prev => [...prev, addedLayer])
+      setShowAddLayerModal(false)
+      setNewLayerContent("")
+      setNewLayerMediaUrl("")
+      setNewLayerType("text")
+      toast({
+        title: "Layer added",
+        description: "Your layer was added to the fusion",
+      })
+      // Jump to the newly added layer
+      setCurrentLayerIndex(allLayers.length) // since allLayers includes seed + localLayers
+    } catch (error) {
+      console.error("Add layer error:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to add layer",
+        variant: "destructive",
+      })
+    } finally {
+      setIsAddingLayer(false)
+    }
+  }
+
+  // Avatar tilt handlers for 3D effect
+  const handleAvatarMouseMove = (e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width // 0..1
+    const y = (e.clientY - rect.top) / rect.height // 0..1
+    const rotateY = (x - 0.5) * 12 // degrees
+    const rotateX = (0.5 - y) * 8
+    setTiltStyle({
+      transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`,
+    })
+  }
+  const handleAvatarMouseLeave = () => {
+    setTiltStyle({ transform: "perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)" })
+  }
 
   const currentLayer = allLayers[currentLayerIndex]
   const totalLayers = allLayers.length
@@ -143,7 +261,21 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   useEffect(() => {
     const loadRealtimeData = async () => {
       const token = localStorage.getItem("auth_token")
-      if (!token) return
+      if (!token) {
+        // Still load public data for unregistered users
+        try {
+          const commentRes = await fetch(`/api/posts/${fusionPost.id}/comments?limit=1`).catch(() => null)
+          if (commentRes?.ok) {
+            const commentData = await commentRes.json()
+            if (commentData.success) {
+              setCommentCount(commentData.data?.total || 0)
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load public data:", error)
+        }
+        return
+      }
 
       try {
         // Load likes, comments, fork count
@@ -187,6 +319,50 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
 
     loadRealtimeData()
   }, [fusionPost.id])
+
+  // Real-time subscriptions for fusion likes and comments
+  useEffect(() => {
+    // Get seed layer ID for this fusion post
+    const seedLayer = allLayers.find(layer => layer.layerOrder === 0)
+    if (!seedLayer) return
+
+    // Subscribe to fusion reactions (likes)
+    const likeChannel = realtimeManager.subscribeToTable(
+      {
+        table: "FusionReaction",
+        event: "*",
+        filter: `layerId=eq.${seedLayer.id}`,
+      },
+      (payload) => {
+        if (payload.eventType === "INSERT") {
+          setLikeCount(prev => prev + 1)
+        } else if (payload.eventType === "DELETE") {
+          setLikeCount(prev => Math.max(0, prev - 1))
+        }
+      }
+    )
+
+    // Subscribe to comments
+    const commentChannel = realtimeManager.subscribeToTable(
+      {
+        table: "Comment",
+        event: "*",
+        filter: `postId=eq.${fusionPost.id}`,
+      },
+      (payload) => {
+        if (payload.eventType === "INSERT") {
+          setCommentCount(prev => prev + 1)
+        } else if (payload.eventType === "DELETE") {
+          setCommentCount(prev => Math.max(0, prev - 1))
+        }
+      }
+    )
+
+    return () => {
+      realtimeManager.unsubscribe(`FusionReaction-layerId=eq.${seedLayer.id}`)
+      realtimeManager.unsubscribe(`Comment-postId=eq.${fusionPost.id}`)
+    }
+  }, [fusionPost.id, allLayers])
 
   useEffect(() => {
     if (isAutoPlaying && totalLayers > 1) {
@@ -429,7 +605,10 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   return (
     <Card
       ref={cardRef}
-      className="relative overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 bg-card shadow-lg hover:shadow-xl group"
+      onMouseMove={handleCardMouseMove}
+      onMouseLeave={handleCardMouseLeave}
+      className="relative overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 bg-card shadow-lg hover:shadow-xl group transform-gpu"
+      style={cardTiltStyle}
     >
       {/* Fusion Badge */}
       <div className="absolute top-4 left-4 z-20 flex gap-2">
@@ -481,9 +660,11 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
           {/* Content based on type */}
           {currentLayer.type === "image" && currentLayer.mediaUrl && (
             <img
+              key={`layer-media-${layerAnimKey}`}
               src={currentLayer.mediaUrl}
               alt={currentLayer.content}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out transform-gpu will-change-transform scale-100"
+              style={{ animation: "fadeInUp .6s ease" } as any}
             />
           )}
 
@@ -498,7 +679,11 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
           )}
 
           {(currentLayer.type === "text" || !currentLayer.mediaUrl) && (
-            <div className="relative z-10 flex items-center justify-center h-full p-8">
+            <div
+              key={`layer-text-${layerAnimKey}`}
+              className="relative z-10 flex items-center justify-center h-full p-8 transition-all duration-700 ease-out"
+              style={{ animation: "fadeInScale .55s ease" } as any}
+            >
               <div className="text-center">
                 <h3 className="text-2xl font-bold mb-4 text-foreground">{fusionPost.title}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">
@@ -537,12 +722,25 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
             </div>
           )}
 
-          {/* Author Info */}
-          <div className="absolute bottom-4 left-4 flex items-center gap-2 backdrop-blur-md bg-background/60 rounded-full px-3 py-2 group-hover:bg-background/80 transition-all">
-            <Avatar className="h-8 w-8 ring-2 ring-primary/30">
-              <AvatarImage src={currentLayer.author?.avatar} />
-              <AvatarFallback>{currentLayer.author?.name?.charAt(0) || "U"}</AvatarFallback>
-            </Avatar>
+          {/* Author Info (interactive 3D profile effect) */}
+          <div
+            onMouseMove={handleAvatarMouseMove}
+            onMouseLeave={handleAvatarMouseLeave}
+            className="absolute bottom-4 left-4 flex items-center gap-3 backdrop-blur-md bg-background/60 rounded-full px-3 py-2 group-hover:bg-background/80 transition-all transform-gpu"
+            style={{ transformStyle: "preserve-3d", transition: "transform 180ms ease", ...tiltStyle }}
+          >
+            {/* neon ring + floating orbs */}
+            <div className="relative flex items-center justify-center">
+              <div className="absolute -inset-1 rounded-full blur-lg opacity-40" style={{ background: `linear-gradient(45deg, rgba(99,102,241,0.9), rgba(236,72,153,0.9))`, filter: "blur(8px)" }} />
+              <div className="absolute -inset-3 rounded-full border border-white/10 animate-pulse-slow" />
+              <Avatar className="h-10 w-10 ring-2 ring-primary/40 relative z-10">
+                <AvatarImage src={currentLayer.author?.avatar} />
+                <AvatarFallback>{currentLayer.author?.name?.charAt(0) || "U"}</AvatarFallback>
+              </Avatar>
+              {/* floating orbs */}
+              <span className="absolute -top-2 -left-2 w-2 h-2 rounded-full bg-primary animate-bounce-slow opacity-80" />
+              <span className="absolute -right-2 -bottom-2 w-2 h-2 rounded-full bg-accent animate-pulse-slow opacity-90" />
+            </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">
                 {currentLayer.author?.name || "Unknown"}
@@ -552,6 +750,7 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
               </span>
             </div>
           </div>
+          {/* End interactive author info */}
         </div>
 
         {/* Navigation Arrows */}
@@ -709,7 +908,13 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
 
           <Button
             size="sm"
-            onClick={onAddLayer}
+            onClick={() => {
+              if (onAddLayer) {
+                onAddLayer()
+              } else {
+                setShowAddLayerModal(true)
+              }
+            }}
             className="bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/50 hover:scale-105 transition-all gap-2"
           >
             <Layers className="w-4 h-4" />
@@ -739,6 +944,68 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
         postTitle={fusionPost.title}
         postId={fusionPost.id}
       />
+
+      {/* Internal Add Layer Modal (fallback when onAddLayer not provided) */}
+      {showAddLayerModal && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddLayerModal(false)} />
+          <div className="relative z-50 w-full max-w-md bg-card rounded-lg p-6 shadow-xl border border-border">
+            <h3 className="text-lg font-bold mb-3">Add a Layer</h3>
+            <div className="space-y-2">
+              <label className="text-xs font-medium">Type</label>
+              <select
+                value={newLayerType}
+                onChange={(e) => setNewLayerType(e.target.value)}
+                className="w-full input bg-transparent"
+              >
+                <option value="text">Text</option>
+                <option value="image">Image (URL)</option>
+                <option value="video">Video (URL)</option>
+                <option value="voice">Voice (URL)</option>
+                <option value="sticker">Sticker</option>
+                <option value="draw">Draw</option>
+                <option value="overlay">Overlay</option>
+              </select>
+
+              <label className="text-xs font-medium">Content</label>
+              <textarea
+                value={newLayerContent}
+                onChange={(e) => setNewLayerContent(e.target.value)}
+                className="w-full textarea bg-transparent"
+                rows={3}
+                placeholder="Add your message or caption..."
+              />
+
+              {(newLayerType === "image" || newLayerType === "video" || newLayerType === "voice") && (
+                <>
+                  <label className="text-xs font-medium">Media URL</label>
+                  <input
+                    value={newLayerMediaUrl}
+                    onChange={(e) => setNewLayerMediaUrl(e.target.value)}
+                    className="w-full input bg-transparent"
+                    placeholder="https://..."
+                  />
+                </>
+              )}
+
+              <div className="flex justify-end gap-2 mt-3">
+                <Button variant="ghost" onClick={() => setShowAddLayerModal(false)}>Cancel</Button>
+                <Button onClick={submitNewLayer} disabled={isAddingLayer}>
+                  {isAddingLayer ? "Adding..." : "Add Layer"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }
+/* Additional keyframe helpers (tailwind may not have the exact utility names in your build).
+   If you use a global CSS file, add these there: 
+   @keyframes fadeInUp { from { opacity:0; transform: translateY(10px)} to {opacity:1; transform:translateY(0)} }
+   @keyframes fadeInScale { from { opacity:0; transform: scale(.98)} to {opacity:1; transform:scale(1)} }
+   .animate-pulse-slow { animation: pulse 2.2s infinite; }
+   .animate-bounce-slow { animation: bounce 3s infinite; }
+   .animate-pulse-slow and others are small helpers — adjust in your global CSS if needed.
+*/

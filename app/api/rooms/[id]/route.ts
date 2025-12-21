@@ -31,6 +31,7 @@ export async function GET(
               },
             },
           },
+          orderBy: { joinedAt: "asc" },
         },
         _count: {
           select: {

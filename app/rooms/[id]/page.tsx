@@ -4,8 +4,12 @@ import { useState, useEffect, use } from "react"
 import { LiveStreamWindow } from "@/components/rooms/live-stream-window"
 import { ClipRecorder } from "@/components/rooms/clip-recorder"
 import { MatchResults } from "@/components/rooms/match-results"
-import { RoomChat } from "@/components/rooms/room-chat"
 import { HighlightReel } from "@/components/rooms/highlight-reel"
+import { GameRoom } from "@/components/rooms/game-room"
+import { PostSharingRoom } from "@/components/rooms/post-sharing-room"
+import { DiscussionRoom } from "@/components/rooms/discussion-room"
+import { CollabCreationRoom } from "@/components/rooms/collab-creation-room"
+import { AnonymousRoom } from "@/components/rooms/anonymous-room"
 import { Button } from "@/components/ui/button"
 import { Video, MessageSquare, Trophy, Zap, ArrowLeft, Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
@@ -203,52 +207,26 @@ export default function RoomDetailPage({ params }: { params: Promise<{ id: strin
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="w-full aspect-video bg-black rounded-2xl border border-border/50 flex items-center justify-center overflow-hidden glass">
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-red-500/20 mx-auto mb-4 flex items-center justify-center animate-pulse">
-                  <div className="w-8 h-8 rounded-full bg-red-500" />
-                </div>
-                <p className="text-white font-bold">{room.isLive ? "Live Stream Active" : "Stream Not Started"}</p>
-                <p className="text-gray-400 text-sm mt-2">{room.members.length} participants</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <Button
-                onClick={() => setIsClipOpen(true)}
-                variant="outline"
-                className="bg-transparent border-white/20 text-foreground hover:bg-white/10"
-              >
-                <Video className="w-4 h-4 mr-2" />
-                Record Clip
-              </Button>
-              <Button
-                onClick={() => setShowResults(true)}
-                variant="outline"
-                className="bg-transparent border-white/20 text-foreground hover:bg-white/10"
-              >
-                <Trophy className="w-4 h-4 mr-2" />
-                Results
-              </Button>
-              <Button variant="outline" className="bg-transparent border-white/20 text-foreground hover:bg-white/10">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                More
-              </Button>
-            </div>
-
-            <div>
-              <HighlightReel highlights={highlights} />
-            </div>
+        {room.type === "game" && (
+          <GameRoom roomId={resolvedParams.id} room={room} currentUser={user!} token={token || ""} />
+        )}
+        {room.type === "post_sharing" && (
+          <PostSharingRoom roomId={resolvedParams.id} room={room} currentUser={user!} token={token || ""} />
+        )}
+        {room.type === "discussion" && (
+          <DiscussionRoom roomId={resolvedParams.id} room={room} currentUser={user!} token={token || ""} />
+        )}
+        {room.type === "collab" && (
+          <CollabCreationRoom roomId={resolvedParams.id} room={room} currentUser={user!} token={token || ""} />
+        )}
+        {room.type === "anonymous" && (
+          <AnonymousRoom roomId={resolvedParams.id} room={room} currentUser={user!} token={token || ""} />
+        )}
+        {!["game", "post_sharing", "discussion", "collab", "anonymous"].includes(room.type) && (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>Room type not supported: {room.type}</p>
           </div>
-
-          <div className="space-y-4">
-            <div className="h-96">
-              <RoomChat messages={messages} onSendMessage={handleSendMessage} />
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       <ClipRecorder

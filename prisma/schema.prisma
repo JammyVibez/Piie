@@ -72,6 +72,7 @@ model User {
   userPreference       UserPreference?      @relation("userPreference")
   settings             UserSettings?
   xpEvents             XPEvent[]
+  purchases            UserPurchase[]       @relation("userPurchases")
 
   @@index([email])
   @@index([username])
@@ -1259,4 +1260,36 @@ enum AudioRoomStatus {
   waiting
   live
   ended
+}
+
+model ShopItem {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  price       Int
+  category    String
+  icon        String
+  rarity      BadgeRarity    @default(common)
+  isActive    Boolean        @default(true)
+  stock       Int?           // null = unlimited
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  purchases   UserPurchase[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model UserPurchase {
+  id          String    @id @default(cuid())
+  userId      String
+  shopItemId  String
+  price       Int
+  purchasedAt DateTime  @default(now())
+  user        User      @relation("userPurchases", fields: [userId], references: [id], onDelete: Cascade)
+  shopItem    ShopItem  @relation(fields: [shopItemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, shopItemId])
+  @@index([userId])
+  @@index([shopItemId])
 }

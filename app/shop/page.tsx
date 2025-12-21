@@ -9,63 +9,19 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/contexts/auth-context"
+import { realtimeManager } from "@/lib/realtime/subscriptions"
 
-const shopItems = [
-  {
-    id: "1",
-    name: "XP Booster",
-    description: "Double your XP gains for 24 hours",
-    price: 500,
-    category: "boosters",
-    icon: "⚡",
-    rarity: "rare",
-  },
-  {
-    id: "2",
-    name: "Premium Badge",
-    description: "Exclusive premium member badge",
-    price: 1000,
-    category: "badges",
-    icon: "👑",
-    rarity: "epic",
-  },
-  {
-    id: "3",
-    name: "Custom Theme",
-    description: "Unlock custom theme editor",
-    price: 750,
-    category: "cosmetics",
-    icon: "🎨",
-    rarity: "rare",
-  },
-  {
-    id: "4",
-    name: "Profile Frame",
-    description: "Legendary animated profile frame",
-    price: 2000,
-    category: "cosmetics",
-    icon: "✨",
-    rarity: "legendary",
-  },
-  {
-    id: "5",
-    name: "Story Boost",
-    description: "Boost your story to the top for 2 hours",
-    price: 300,
-    category: "boosters",
-    icon: "🚀",
-    rarity: "common",
-  },
-  {
-    id: "6",
-    name: "Verified Badge",
-    description: "Get the verified checkmark",
-    price: 5000,
-    category: "badges",
-    icon: "✓",
-    rarity: "legendary",
-  },
-]
+interface ShopItem {
+  id: string
+  name: string
+  description: string
+  price: number
+  category: string
+  icon: string
+  rarity: string
+  stock: number | null
+  isActive: boolean
+}
 
 const rarityColors = {
   common: "border-slate-500/30 bg-slate-500/5",
@@ -77,43 +33,108 @@ const rarityColors = {
 export default function ShopPage() {
   const { user, token, refreshUser } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [userCoins, setUserCoins] = useState(user?.xp || 0)
+  const [shopItems, setShopItems] = useState<ShopItem[]>([])
+  const [userCoins, setUserCoins] = useState((user?.coins || user?.xp) || 0)
   const [purchasedItems, setPurchasedItems] = useState<string[]>([])
   const [isPurchasing, setIsPurchasing] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load purchased items
+  // Load shop items and purchased items
   useEffect(() => {
-    const loadPurchasedItems = async () => {
-      if (!token) {
-        setIsLoading(false)
-        return
-      }
-
+    const loadShopData = async () => {
+      setIsLoading(true)
       try {
-        const response = await fetch('/api/shop/items', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+        const headers: HeadersInit = {}
+        if (token) {
+          headers.Authorization = `Bearer ${token}`
+        }
+
+        const response = await fetch('/api/shop/items', { headers })
         const result = await response.json()
         if (result.success) {
-          setPurchasedItems(result.data.purchasedItems)
+          setShopItems(result.data.items || [])
+          setPurchasedItems(result.data.purchasedItems || [])
         }
       } catch (error) {
-        console.error('Failed to load purchased items:', error)
+        console.error('Failed to load shop data:', error)
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadPurchasedItems()
+    loadShopData()
   }, [token])
+
+  // Realtime subscriptions for shop
+  useEffect(() => {
+    if (!token) return
+
+    // Subscribe to shop item updates
+    const shopChannel = realtimeManager.subscribeToTable(
+      {
+        table: "ShopItem",
+        event: "*",
+      },
+      (payload) => {
+        if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+          // Reload shop items
+          fetch('/api/shop/items', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+            .then(res => res.json())
+            .then(result => {
+              if (result.success) {
+                setShopItems(result.data.items || [])
+              }
+            })
+        }
+      }
+    )
+
+    // Subscribe to user purchase updates
+    const purchaseChannel = realtimeManager.subscribeToTable(
+      {
+        table: "UserPurchase",
+        event: "*",
+        filter: token ? undefined : undefined, // Will filter by userId if needed
+      },
+      (payload) => {
+        if (payload.eventType === "INSERT" && payload.new) {
+          const purchase = payload.new as any
+          // Update purchased items list
+          setPurchasedItems(prev => [...prev, purchase.shopItemId])
+        }
+      }
+    )
+
+    // Subscribe to user balance updates
+    const userChannel = realtimeManager.subscribeToTable(
+      {
+        table: "User",
+        event: "UPDATE",
+        filter: user?.id ? `id=eq.${user.id}` : undefined,
+      },
+      (payload) => {
+        if (payload.eventType === "UPDATE" && payload.new) {
+          const updatedUser = payload.new as any
+          setUserCoins((updatedUser.coins || updatedUser.xp) || 0)
+        }
+      }
+    )
+
+    return () => {
+      realtimeManager.unsubscribe("ShopItem-all")
+      realtimeManager.unsubscribe("UserPurchase-all")
+      if (user?.id) {
+        realtimeManager.unsubscribe(`User-id=eq.${user.id}`)
+      }
+    }
+  }, [token, user?.id])
 
   // Update coins when user changes
   useEffect(() => {
     if (user) {
-      setUserCoins(user.xp || 0)
+      setUserCoins((user.coins || user.xp) || 0)
     }
   }, [user])
 
@@ -121,7 +142,7 @@ export default function ShopPage() {
     ? shopItems 
     : shopItems.filter(item => item.category === selectedCategory)
 
-  const handlePurchase = async (item: typeof shopItems[0]) => {
+  const handlePurchase = async (item: ShopItem) => {
     if (!token || !user) {
       alert("Please login to purchase items")
       return
@@ -134,6 +155,11 @@ export default function ShopPage() {
 
     if (purchasedItems.includes(item.id)) {
       alert("You already own this item!")
+      return
+    }
+
+    if (item.stock !== null && item.stock <= 0) {
+      alert("This item is out of stock!")
       return
     }
     
@@ -150,10 +176,7 @@ export default function ShopPage() {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          itemId: item.id,
-          itemName: item.name,
-          price: item.price,
-          category: item.category
+          itemId: item.id
         })
       })
 
@@ -161,6 +184,12 @@ export default function ShopPage() {
       if (result.success) {
         setUserCoins(result.data.newBalance)
         setPurchasedItems(prev => [...prev, item.id])
+        // Update item stock in local state
+        setShopItems(prev => prev.map(i => 
+          i.id === item.id 
+            ? { ...i, stock: i.stock !== null ? i.stock - 1 : null }
+            : i
+        ))
         alert(`Successfully purchased ${item.name}!`)
         // Refresh user data
         if (refreshUser) {

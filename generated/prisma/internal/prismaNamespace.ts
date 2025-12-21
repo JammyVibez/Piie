@@ -443,7 +443,9 @@ export const ModelName = {
   ThreadShare: 'ThreadShare',
   CommunityMessage: 'CommunityMessage',
   CommunityMessageReaction: 'CommunityMessageReaction',
-  UserOnboarding: 'UserOnboarding'
+  UserOnboarding: 'UserOnboarding',
+  ShopItem: 'ShopItem',
+  UserPurchase: 'UserPurchase'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -459,7 +461,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userSettings" | "session" | "fusionPost" | "fusionLayer" | "fusionReaction" | "room" | "roomMember" | "roomMessage" | "roomSession" | "matchResult" | "roomHighlight" | "roomMemory" | "community" | "communityMember" | "thread" | "threadMessage" | "event" | "eventAttendee" | "media" | "userPreference" | "passwordResetToken" | "badge" | "userBadge" | "achievement" | "userAchievement" | "follow" | "post" | "postTag" | "poll" | "pollOption" | "pollVote" | "comment" | "like" | "bookmark" | "bookmarkCollection" | "conversation" | "message" | "messageAttachment" | "messageReaction" | "notification" | "report" | "trendingTopic" | "challenge" | "challengeProgress" | "xPEvent" | "leaderboardSeason" | "leaderboardEntry" | "audioRoom" | "audioParticipant" | "mediaAsset" | "systemSetting" | "communityPost" | "communityPostComment" | "communityPostLike" | "threadLike" | "threadShare" | "communityMessage" | "communityMessageReaction" | "userOnboarding"
+    modelProps: "user" | "userSettings" | "session" | "fusionPost" | "fusionLayer" | "fusionReaction" | "room" | "roomMember" | "roomMessage" | "roomSession" | "matchResult" | "roomHighlight" | "roomMemory" | "community" | "communityMember" | "thread" | "threadMessage" | "event" | "eventAttendee" | "media" | "userPreference" | "passwordResetToken" | "badge" | "userBadge" | "achievement" | "userAchievement" | "follow" | "post" | "postTag" | "poll" | "pollOption" | "pollVote" | "comment" | "like" | "bookmark" | "bookmarkCollection" | "conversation" | "message" | "messageAttachment" | "messageReaction" | "notification" | "report" | "trendingTopic" | "challenge" | "challengeProgress" | "xPEvent" | "leaderboardSeason" | "leaderboardEntry" | "audioRoom" | "audioParticipant" | "mediaAsset" | "systemSetting" | "communityPost" | "communityPostComment" | "communityPostLike" | "threadLike" | "threadShare" | "communityMessage" | "communityMessageReaction" | "userOnboarding" | "shopItem" | "userPurchase"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4903,6 +4905,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ShopItem: {
+      payload: Prisma.$ShopItemPayload<ExtArgs>
+      fields: Prisma.ShopItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ShopItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ShopItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>
+        }
+        findFirst: {
+          args: Prisma.ShopItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ShopItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>
+        }
+        findMany: {
+          args: Prisma.ShopItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>[]
+        }
+        create: {
+          args: Prisma.ShopItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>
+        }
+        createMany: {
+          args: Prisma.ShopItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ShopItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>[]
+        }
+        delete: {
+          args: Prisma.ShopItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>
+        }
+        update: {
+          args: Prisma.ShopItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.ShopItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ShopItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ShopItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.ShopItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShopItemPayload>
+        }
+        aggregate: {
+          args: Prisma.ShopItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateShopItem>
+        }
+        groupBy: {
+          args: Prisma.ShopItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ShopItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ShopItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ShopItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserPurchase: {
+      payload: Prisma.$UserPurchasePayload<ExtArgs>
+      fields: Prisma.UserPurchaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserPurchaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserPurchaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>
+        }
+        findFirst: {
+          args: Prisma.UserPurchaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserPurchaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>
+        }
+        findMany: {
+          args: Prisma.UserPurchaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>[]
+        }
+        create: {
+          args: Prisma.UserPurchaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>
+        }
+        createMany: {
+          args: Prisma.UserPurchaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserPurchaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>[]
+        }
+        delete: {
+          args: Prisma.UserPurchaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>
+        }
+        update: {
+          args: Prisma.UserPurchaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>
+        }
+        deleteMany: {
+          args: Prisma.UserPurchaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserPurchaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserPurchaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>[]
+        }
+        upsert: {
+          args: Prisma.UserPurchaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPurchasePayload>
+        }
+        aggregate: {
+          args: Prisma.UserPurchaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserPurchase>
+        }
+        groupBy: {
+          args: Prisma.UserPurchaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserPurchaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserPurchaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserPurchaseCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -5829,6 +5979,34 @@ export const UserOnboardingScalarFieldEnum = {
 export type UserOnboardingScalarFieldEnum = (typeof UserOnboardingScalarFieldEnum)[keyof typeof UserOnboardingScalarFieldEnum]
 
 
+export const ShopItemScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  price: 'price',
+  category: 'category',
+  icon: 'icon',
+  rarity: 'rarity',
+  isActive: 'isActive',
+  stock: 'stock',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ShopItemScalarFieldEnum = (typeof ShopItemScalarFieldEnum)[keyof typeof ShopItemScalarFieldEnum]
+
+
+export const UserPurchaseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  shopItemId: 'shopItemId',
+  price: 'price',
+  purchasedAt: 'purchasedAt'
+} as const
+
+export type UserPurchaseScalarFieldEnum = (typeof UserPurchaseScalarFieldEnum)[keyof typeof UserPurchaseScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -6450,6 +6628,8 @@ export type GlobalOmitConfig = {
   communityMessage?: Prisma.CommunityMessageOmit
   communityMessageReaction?: Prisma.CommunityMessageReactionOmit
   userOnboarding?: Prisma.UserOnboardingOmit
+  shopItem?: Prisma.ShopItemOmit
+  userPurchase?: Prisma.UserPurchaseOmit
 }
 
 /* Types for Logging */

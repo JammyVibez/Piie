@@ -21,6 +21,7 @@ import {
   Radio
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { realtimeManager } from "@/lib/realtime/subscriptions"
 
 interface AdminStats {
   users: { total: number; online: number; banned: number }
@@ -55,6 +56,43 @@ export default function AdminPage() {
     if (token) {
       fetchStats()
       fetchChallenges()
+    }
+  }, [token])
+
+  // Realtime subscriptions for admin data
+  useEffect(() => {
+    if (!token) return
+
+    // Subscribe to challenge updates
+    const challengeChannel = realtimeManager.subscribeToTable(
+      {
+        table: "Achievement",
+        event: "*",
+      },
+      (payload) => {
+        if (payload.eventType === "INSERT") {
+          fetchChallenges()
+        } else if (payload.eventType === "UPDATE" || payload.eventType === "DELETE") {
+          fetchChallenges()
+        }
+      }
+    )
+
+    // Subscribe to user stats updates (via User table)
+    const userChannel = realtimeManager.subscribeToTable(
+      {
+        table: "User",
+        event: "*",
+      },
+      () => {
+        // Refresh stats when users change
+        fetchStats()
+      }
+    )
+
+    return () => {
+      realtimeManager.unsubscribe("Achievement-all")
+      realtimeManager.unsubscribe("User-all")
     }
   }, [token])
 

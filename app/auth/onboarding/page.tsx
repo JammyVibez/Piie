@@ -10,6 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowRight, ArrowLeft, Loader2, Upload, Check, Sparkles, Users, Compass, Trophy } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { realtimeManager } from "@/lib/realtime/subscriptions"
+import { useToast } from "@/hooks/use-toast"
 
 const interests = [
   { id: "tech", label: "Technology", icon: "💻" },
@@ -43,8 +45,11 @@ export default function OnboardingPage() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([])
   const [followingUsers, setFollowingUsers] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const { toast } = useToast()
 
   const totalSteps = 4
 
@@ -87,15 +92,68 @@ export default function OnboardingPage() {
       }
     }
 
-    loadData()
-  }, [router])
+        loadData()
+    }, [router])
+
+    // Realtime subscription for user updates
+    useEffect(() => {
+      if (!currentUser?.id) return
+
+      const token = localStorage.getItem("auth_token")
+      if (!token) return
+
+      const channel = realtimeManager.subscribeToTable(
+        {
+          table: "User",
+          event: "UPDATE",
+          filter: `id=eq.${currentUser.id}`,
+        },
+        (payload) => {
+          if (payload.eventType === "UPDATE" && payload.new) {
+            const updatedUser = payload.new as any
+            setCurrentUser(prev => ({ ...prev, ...updatedUser }))
+            if (updatedUser.avatar) setAvatarUrl(updatedUser.avatar)
+            if (updatedUser.bio) setBio(updatedUser.bio)
+            if (updatedUser.location) setLocation(updatedUser.location)
+          }
+        }
+      )
+
+      return () => {
+        realtimeManager.unsubscribe(`User-id=eq.${currentUser.id}`)
+      }
+    }, [currentUser?.id])
 
   const toggleInterest = (id: string) => {
     setSelectedInterests((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]))
   }
 
-  const toggleFollow = (id: string) => {
-    setFollowingUsers((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]))
+  const toggleFollow = async (id: string) => {
+    const token = localStorage.getItem("auth_token")
+    if (!token) return
+
+    const isCurrentlyFollowing = followingUsers.includes(id)
+    
+    try {
+      const method = isCurrentlyFollowing ? "DELETE" : "POST"
+      const response = await fetch(`/api/users/${id}/follow`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        setFollowingUsers((prev) => 
+          isCurrentlyFollowing 
+            ? prev.filter((i) => i !== id) 
+            : [...prev, id]
+        )
+      }
+    } catch (error) {
+      console.error("Failed to toggle follow:", error)
+    }
   }
 
   const handleNext = async () => {
@@ -180,9 +238,81 @@ export default function OnboardingPage() {
                     <AvatarImage src={avatarUrl || "/placeholder.svg?key=d1j5c"} />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
-                  <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-lg hover:bg-primary/90 transition-colors">
+                  <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-lg hover:bg-primary/90 transition-colors cursor-pointer">
                     <Upload size={14} />
-                  </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        
+                        if (!file.type.startsWith('image/')) {
+                          toast({
+                            title: "Error",
+                            description: "Please select an image file",
+                            variant: "destructive"
+                          })
+                          return
+                        }
+
+                        setAvatarFile(file)
+                        setIsUploading(true)
+                        
+                        try {
+                          const token = localStorage.getItem("auth_token")
+                          if (!token) {
+                            toast({
+                              title: "Error",
+                              description: "Please login to upload avatar",
+                              variant: "destructive"
+                            })
+                            return
+                          }
+
+                          const formData = new FormData()
+                          formData.append('file', file)
+                          formData.append('type', 'avatar')
+
+                          const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            headers: {
+                              'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                          })
+
+                          if (!uploadRes.ok) {
+                            throw new Error('Upload failed')
+                          }
+
+                          const uploadData = await uploadRes.json()
+                          if (uploadData.success && uploadData.data?.url) {
+                            setAvatarUrl(uploadData.data.url)
+                            toast({
+                              title: "Success",
+                              description: "Avatar uploaded successfully"
+                            })
+                          }
+                        } catch (error) {
+                          console.error("Upload error:", error)
+                          toast({
+                            title: "Error",
+                            description: "Failed to upload avatar",
+                            variant: "destructive"
+                          })
+                        } finally {
+                          setIsUploading(false)
+                        }
+                      }}
+                    />
+                  </label>
+                  {isUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    </div>
+                  )}
                 </div>
               </div>
 

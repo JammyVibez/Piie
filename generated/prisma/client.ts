@@ -339,3 +339,13 @@ export type CommunityMessageReaction = Prisma.CommunityMessageReactionModel
  * 
  */
 export type UserOnboarding = Prisma.UserOnboardingModel
+/**
+ * Model ShopItem
+ * 
+ */
+export type ShopItem = Prisma.ShopItemModel
+/**
+ * Model UserPurchase
+ * 
+ */
+export type UserPurchase = Prisma.UserPurchaseModel

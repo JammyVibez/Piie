@@ -45,6 +45,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
 import Link from "next/link"
+import { realtimeManager } from "@/lib/realtime/subscriptions"
 
 // Chat wallpaper options
 const wallpaperOptions = [
@@ -222,6 +223,45 @@ export default function SettingsPage() {
       document.documentElement.removeAttribute("data-theme")
     }
   }, [formData.theme])
+
+  // Realtime subscription for settings updates
+  useEffect(() => {
+    if (!user?.id || !token) return
+
+    const channel = realtimeManager.subscribeToTable(
+      {
+        table: "UserSettings",
+        event: "UPDATE",
+        filter: `userId=eq.${user.id}`,
+      },
+      (payload) => {
+        if (payload.eventType === "UPDATE" && payload.new) {
+          const newSettings = payload.new as any
+          setFormData(prev => ({
+            ...prev,
+            emailNotifications: newSettings.emailNotifications ?? prev.emailNotifications,
+            pushNotifications: newSettings.pushNotifications ?? prev.pushNotifications,
+            notifyLikes: newSettings.notifyLikes ?? prev.likeNotifications,
+            notifyComments: newSettings.notifyComments ?? prev.likeNotifications,
+            notifyFollows: newSettings.notifyFollows ?? prev.followNotifications,
+            notifyMentions: newSettings.notifyMentions ?? prev.mentionNotifications,
+            notifyMessages: newSettings.notifyMessages ?? prev.messageNotifications,
+            profileVisibility: (newSettings.profileVisibility as any) ?? prev.profileVisibility,
+            showOnlineStatus: newSettings.showOnlineStatus ?? prev.showOnlineStatus,
+            allowMessages: (newSettings.allowMessages as any) ?? prev.allowMessages,
+            theme: newSettings.theme ?? prev.theme,
+            chatWallpaper: newSettings.chatWallpaper ?? prev.chatWallpaper,
+            language: newSettings.language ?? prev.language,
+            timezone: newSettings.timezone ?? prev.timezone,
+          }))
+        }
+      }
+    )
+
+    return () => {
+      realtimeManager.unsubscribe(`UserSettings-userId=eq.${user.id}`)
+    }
+  }, [user?.id, token])
 
   const updateSetting = <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }))

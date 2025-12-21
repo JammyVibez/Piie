@@ -388,6 +388,7 @@ export type UserWhereInput = {
   userPreference?: Prisma.XOR<Prisma.UserPreferenceNullableScalarRelationFilter, Prisma.UserPreferenceWhereInput> | null
   settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
   xpEvents?: Prisma.XPEventListRelationFilter
+  purchases?: Prisma.UserPurchaseListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -455,6 +456,7 @@ export type UserOrderByWithRelationInput = {
   userPreference?: Prisma.UserPreferenceOrderByWithRelationInput
   settings?: Prisma.UserSettingsOrderByWithRelationInput
   xpEvents?: Prisma.XPEventOrderByRelationAggregateInput
+  purchases?: Prisma.UserPurchaseOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -525,6 +527,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   userPreference?: Prisma.XOR<Prisma.UserPreferenceNullableScalarRelationFilter, Prisma.UserPreferenceWhereInput> | null
   settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
   xpEvents?: Prisma.XPEventListRelationFilter
+  purchases?: Prisma.UserPurchaseListRelationFilter
 }, "id" | "email" | "username">
 
 export type UserOrderByWithAggregationInput = {
@@ -646,6 +649,7 @@ export type UserCreateInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -713,6 +717,7 @@ export type UserUncheckedCreateInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -780,6 +785,7 @@ export type UserUpdateInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -847,6 +853,7 @@ export type UserUncheckedUpdateInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1667,6 +1674,20 @@ export type UserUpdateOneRequiredWithoutOnboardingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOnboardingInput, Prisma.UserUpdateWithoutOnboardingInput>, Prisma.UserUncheckedUpdateWithoutOnboardingInput>
 }
 
+export type UserCreateNestedOneWithoutPurchasesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPurchasesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPurchasesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPurchasesInput
+  upsert?: Prisma.UserUpsertWithoutPurchasesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPurchasesInput, Prisma.UserUpdateWithoutPurchasesInput>, Prisma.UserUncheckedUpdateWithoutPurchasesInput>
+}
+
 export type UserCreateWithoutSettingsInput = {
   id?: string
   email: string
@@ -1731,6 +1752,7 @@ export type UserCreateWithoutSettingsInput = {
   onboarding?: Prisma.UserOnboardingCreateNestedOneWithoutUserInput
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -1797,6 +1819,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   onboarding?: Prisma.UserOnboardingUncheckedCreateNestedOneWithoutUserInput
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -1879,6 +1902,7 @@ export type UserUpdateWithoutSettingsInput = {
   onboarding?: Prisma.UserOnboardingUpdateOneWithoutUserNestedInput
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -1945,6 +1969,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   onboarding?: Prisma.UserOnboardingUncheckedUpdateOneWithoutUserNestedInput
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -2011,6 +2036,7 @@ export type UserCreateWithoutSessionsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -2077,6 +2103,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -2159,6 +2186,7 @@ export type UserUpdateWithoutSessionsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -2225,6 +2253,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFusionPostsInput = {
@@ -2291,6 +2320,7 @@ export type UserCreateWithoutFusionPostsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFusionPostsInput = {
@@ -2357,6 +2387,7 @@ export type UserUncheckedCreateWithoutFusionPostsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFusionPostsInput = {
@@ -2439,6 +2470,7 @@ export type UserUpdateWithoutFusionPostsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFusionPostsInput = {
@@ -2505,6 +2537,7 @@ export type UserUncheckedUpdateWithoutFusionPostsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFusionLayersInput = {
@@ -2571,6 +2604,7 @@ export type UserCreateWithoutFusionLayersInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFusionLayersInput = {
@@ -2637,6 +2671,7 @@ export type UserUncheckedCreateWithoutFusionLayersInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFusionLayersInput = {
@@ -2719,6 +2754,7 @@ export type UserUpdateWithoutFusionLayersInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFusionLayersInput = {
@@ -2785,6 +2821,7 @@ export type UserUncheckedUpdateWithoutFusionLayersInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFusionReactionsInput = {
@@ -2851,6 +2888,7 @@ export type UserCreateWithoutFusionReactionsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFusionReactionsInput = {
@@ -2917,6 +2955,7 @@ export type UserUncheckedCreateWithoutFusionReactionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFusionReactionsInput = {
@@ -2999,6 +3038,7 @@ export type UserUpdateWithoutFusionReactionsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFusionReactionsInput = {
@@ -3065,6 +3105,7 @@ export type UserUncheckedUpdateWithoutFusionReactionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedRoomsInput = {
@@ -3131,6 +3172,7 @@ export type UserCreateWithoutOwnedRoomsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedRoomsInput = {
@@ -3197,6 +3239,7 @@ export type UserUncheckedCreateWithoutOwnedRoomsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedRoomsInput = {
@@ -3279,6 +3322,7 @@ export type UserUpdateWithoutOwnedRoomsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedRoomsInput = {
@@ -3345,6 +3389,7 @@ export type UserUncheckedUpdateWithoutOwnedRoomsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRoomMembershipsInput = {
@@ -3411,6 +3456,7 @@ export type UserCreateWithoutRoomMembershipsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRoomMembershipsInput = {
@@ -3477,6 +3523,7 @@ export type UserUncheckedCreateWithoutRoomMembershipsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRoomMembershipsInput = {
@@ -3559,6 +3606,7 @@ export type UserUpdateWithoutRoomMembershipsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoomMembershipsInput = {
@@ -3625,6 +3673,7 @@ export type UserUncheckedUpdateWithoutRoomMembershipsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRoomMessagesInput = {
@@ -3691,6 +3740,7 @@ export type UserCreateWithoutRoomMessagesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRoomMessagesInput = {
@@ -3757,6 +3807,7 @@ export type UserUncheckedCreateWithoutRoomMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRoomMessagesInput = {
@@ -3839,6 +3890,7 @@ export type UserUpdateWithoutRoomMessagesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoomMessagesInput = {
@@ -3905,6 +3957,7 @@ export type UserUncheckedUpdateWithoutRoomMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutHostedSessionsInput = {
@@ -3971,6 +4024,7 @@ export type UserCreateWithoutHostedSessionsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHostedSessionsInput = {
@@ -4037,6 +4091,7 @@ export type UserUncheckedCreateWithoutHostedSessionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutHostedSessionsInput = {
@@ -4119,6 +4174,7 @@ export type UserUpdateWithoutHostedSessionsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHostedSessionsInput = {
@@ -4185,6 +4241,7 @@ export type UserUncheckedUpdateWithoutHostedSessionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommunitiesOwnedInput = {
@@ -4251,6 +4308,7 @@ export type UserCreateWithoutCommunitiesOwnedInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommunitiesOwnedInput = {
@@ -4317,6 +4375,7 @@ export type UserUncheckedCreateWithoutCommunitiesOwnedInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommunitiesOwnedInput = {
@@ -4399,6 +4458,7 @@ export type UserUpdateWithoutCommunitiesOwnedInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommunitiesOwnedInput = {
@@ -4465,6 +4525,7 @@ export type UserUncheckedUpdateWithoutCommunitiesOwnedInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommunityMembershipsInput = {
@@ -4531,6 +4592,7 @@ export type UserCreateWithoutCommunityMembershipsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommunityMembershipsInput = {
@@ -4597,6 +4659,7 @@ export type UserUncheckedCreateWithoutCommunityMembershipsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommunityMembershipsInput = {
@@ -4679,6 +4742,7 @@ export type UserUpdateWithoutCommunityMembershipsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommunityMembershipsInput = {
@@ -4745,6 +4809,7 @@ export type UserUncheckedUpdateWithoutCommunityMembershipsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutThreadAuthoredInput = {
@@ -4811,6 +4876,7 @@ export type UserCreateWithoutThreadAuthoredInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutThreadAuthoredInput = {
@@ -4877,6 +4943,7 @@ export type UserUncheckedCreateWithoutThreadAuthoredInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutThreadAuthoredInput = {
@@ -4959,6 +5026,7 @@ export type UserUpdateWithoutThreadAuthoredInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutThreadAuthoredInput = {
@@ -5025,6 +5093,7 @@ export type UserUncheckedUpdateWithoutThreadAuthoredInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutThreadMessagesInput = {
@@ -5091,6 +5160,7 @@ export type UserCreateWithoutThreadMessagesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutThreadMessagesInput = {
@@ -5157,6 +5227,7 @@ export type UserUncheckedCreateWithoutThreadMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutThreadMessagesInput = {
@@ -5239,6 +5310,7 @@ export type UserUpdateWithoutThreadMessagesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutThreadMessagesInput = {
@@ -5305,6 +5377,7 @@ export type UserUncheckedUpdateWithoutThreadMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventsOrganizedInput = {
@@ -5371,6 +5444,7 @@ export type UserCreateWithoutEventsOrganizedInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventsOrganizedInput = {
@@ -5437,6 +5511,7 @@ export type UserUncheckedCreateWithoutEventsOrganizedInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventsOrganizedInput = {
@@ -5519,6 +5594,7 @@ export type UserUpdateWithoutEventsOrganizedInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventsOrganizedInput = {
@@ -5585,6 +5661,7 @@ export type UserUncheckedUpdateWithoutEventsOrganizedInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventAttendancesInput = {
@@ -5651,6 +5728,7 @@ export type UserCreateWithoutEventAttendancesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventAttendancesInput = {
@@ -5717,6 +5795,7 @@ export type UserUncheckedCreateWithoutEventAttendancesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventAttendancesInput = {
@@ -5799,6 +5878,7 @@ export type UserUpdateWithoutEventAttendancesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventAttendancesInput = {
@@ -5865,6 +5945,7 @@ export type UserUncheckedUpdateWithoutEventAttendancesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMediaItemsInput = {
@@ -5931,6 +6012,7 @@ export type UserCreateWithoutMediaItemsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMediaItemsInput = {
@@ -5997,6 +6079,7 @@ export type UserUncheckedCreateWithoutMediaItemsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMediaItemsInput = {
@@ -6079,6 +6162,7 @@ export type UserUpdateWithoutMediaItemsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaItemsInput = {
@@ -6145,6 +6229,7 @@ export type UserUncheckedUpdateWithoutMediaItemsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserPreferenceInput = {
@@ -6211,6 +6296,7 @@ export type UserCreateWithoutUserPreferenceInput = {
   onboarding?: Prisma.UserOnboardingCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserPreferenceInput = {
@@ -6277,6 +6363,7 @@ export type UserUncheckedCreateWithoutUserPreferenceInput = {
   onboarding?: Prisma.UserOnboardingUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserPreferenceInput = {
@@ -6359,6 +6446,7 @@ export type UserUpdateWithoutUserPreferenceInput = {
   onboarding?: Prisma.UserOnboardingUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserPreferenceInput = {
@@ -6425,6 +6513,7 @@ export type UserUncheckedUpdateWithoutUserPreferenceInput = {
   onboarding?: Prisma.UserOnboardingUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPasswordResetTokensInput = {
@@ -6491,6 +6580,7 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -6557,6 +6647,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -6639,6 +6730,7 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -6705,6 +6797,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBadgesInput = {
@@ -6771,6 +6864,7 @@ export type UserCreateWithoutBadgesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBadgesInput = {
@@ -6837,6 +6931,7 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBadgesInput = {
@@ -6919,6 +7014,7 @@ export type UserUpdateWithoutBadgesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBadgesInput = {
@@ -6985,6 +7081,7 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAchievementsInput = {
@@ -7051,6 +7148,7 @@ export type UserCreateWithoutAchievementsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAchievementsInput = {
@@ -7117,6 +7215,7 @@ export type UserUncheckedCreateWithoutAchievementsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAchievementsInput = {
@@ -7199,6 +7298,7 @@ export type UserUpdateWithoutAchievementsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAchievementsInput = {
@@ -7265,6 +7365,7 @@ export type UserUncheckedUpdateWithoutAchievementsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFollowingInput = {
@@ -7331,6 +7432,7 @@ export type UserCreateWithoutFollowingInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFollowingInput = {
@@ -7397,6 +7499,7 @@ export type UserUncheckedCreateWithoutFollowingInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFollowingInput = {
@@ -7468,6 +7571,7 @@ export type UserCreateWithoutFollowersInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFollowersInput = {
@@ -7534,6 +7638,7 @@ export type UserUncheckedCreateWithoutFollowersInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFollowersInput = {
@@ -7616,6 +7721,7 @@ export type UserUpdateWithoutFollowingInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowingInput = {
@@ -7682,6 +7788,7 @@ export type UserUncheckedUpdateWithoutFollowingInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutFollowersInput = {
@@ -7759,6 +7866,7 @@ export type UserUpdateWithoutFollowersInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowersInput = {
@@ -7825,6 +7933,7 @@ export type UserUncheckedUpdateWithoutFollowersInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -7891,6 +8000,7 @@ export type UserCreateWithoutPostsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -7957,6 +8067,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -8039,6 +8150,7 @@ export type UserUpdateWithoutPostsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -8105,6 +8217,7 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPollVotesInput = {
@@ -8171,6 +8284,7 @@ export type UserCreateWithoutPollVotesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPollVotesInput = {
@@ -8237,6 +8351,7 @@ export type UserUncheckedCreateWithoutPollVotesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPollVotesInput = {
@@ -8319,6 +8434,7 @@ export type UserUpdateWithoutPollVotesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPollVotesInput = {
@@ -8385,6 +8501,7 @@ export type UserUncheckedUpdateWithoutPollVotesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -8451,6 +8568,7 @@ export type UserCreateWithoutCommentsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -8517,6 +8635,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -8599,6 +8718,7 @@ export type UserUpdateWithoutCommentsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -8665,6 +8785,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLikesInput = {
@@ -8731,6 +8852,7 @@ export type UserCreateWithoutLikesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesInput = {
@@ -8797,6 +8919,7 @@ export type UserUncheckedCreateWithoutLikesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesInput = {
@@ -8879,6 +9002,7 @@ export type UserUpdateWithoutLikesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesInput = {
@@ -8945,6 +9069,7 @@ export type UserUncheckedUpdateWithoutLikesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBookmarksInput = {
@@ -9011,6 +9136,7 @@ export type UserCreateWithoutBookmarksInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarksInput = {
@@ -9077,6 +9203,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarksInput = {
@@ -9159,6 +9286,7 @@ export type UserUpdateWithoutBookmarksInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarksInput = {
@@ -9225,6 +9353,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBookmarkCollectionsInput = {
@@ -9291,6 +9420,7 @@ export type UserCreateWithoutBookmarkCollectionsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarkCollectionsInput = {
@@ -9357,6 +9487,7 @@ export type UserUncheckedCreateWithoutBookmarkCollectionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarkCollectionsInput = {
@@ -9439,6 +9570,7 @@ export type UserUpdateWithoutBookmarkCollectionsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarkCollectionsInput = {
@@ -9505,6 +9637,7 @@ export type UserUncheckedUpdateWithoutBookmarkCollectionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversations1Input = {
@@ -9571,6 +9704,7 @@ export type UserCreateWithoutConversations1Input = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversations1Input = {
@@ -9637,6 +9771,7 @@ export type UserUncheckedCreateWithoutConversations1Input = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversations1Input = {
@@ -9708,6 +9843,7 @@ export type UserCreateWithoutConversations2Input = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversations2Input = {
@@ -9774,6 +9910,7 @@ export type UserUncheckedCreateWithoutConversations2Input = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversations2Input = {
@@ -9856,6 +9993,7 @@ export type UserUpdateWithoutConversations1Input = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversations1Input = {
@@ -9922,6 +10060,7 @@ export type UserUncheckedUpdateWithoutConversations1Input = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutConversations2Input = {
@@ -9999,6 +10138,7 @@ export type UserUpdateWithoutConversations2Input = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversations2Input = {
@@ -10065,6 +10205,7 @@ export type UserUncheckedUpdateWithoutConversations2Input = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReceivedMessagesInput = {
@@ -10131,6 +10272,7 @@ export type UserCreateWithoutReceivedMessagesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -10197,6 +10339,7 @@ export type UserUncheckedCreateWithoutReceivedMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -10268,6 +10411,7 @@ export type UserCreateWithoutSentMessagesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -10334,6 +10478,7 @@ export type UserUncheckedCreateWithoutSentMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -10416,6 +10561,7 @@ export type UserUpdateWithoutReceivedMessagesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -10482,6 +10628,7 @@ export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSentMessagesInput = {
@@ -10559,6 +10706,7 @@ export type UserUpdateWithoutSentMessagesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -10625,6 +10773,7 @@ export type UserUncheckedUpdateWithoutSentMessagesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessageReactionsInput = {
@@ -10691,6 +10840,7 @@ export type UserCreateWithoutMessageReactionsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessageReactionsInput = {
@@ -10757,6 +10907,7 @@ export type UserUncheckedCreateWithoutMessageReactionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessageReactionsInput = {
@@ -10839,6 +10990,7 @@ export type UserUpdateWithoutMessageReactionsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessageReactionsInput = {
@@ -10905,6 +11057,7 @@ export type UserUncheckedUpdateWithoutMessageReactionsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -10971,6 +11124,7 @@ export type UserCreateWithoutNotificationsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -11037,6 +11191,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -11108,6 +11263,7 @@ export type UserCreateWithoutNotificationsSentInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsSentInput = {
@@ -11174,6 +11330,7 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsSentInput = {
@@ -11256,6 +11413,7 @@ export type UserUpdateWithoutNotificationsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -11322,6 +11480,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutNotificationsSentInput = {
@@ -11399,6 +11558,7 @@ export type UserUpdateWithoutNotificationsSentInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsSentInput = {
@@ -11465,6 +11625,7 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportedItemsInput = {
@@ -11531,6 +11692,7 @@ export type UserCreateWithoutReportedItemsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedItemsInput = {
@@ -11597,6 +11759,7 @@ export type UserUncheckedCreateWithoutReportedItemsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedItemsInput = {
@@ -11668,6 +11831,7 @@ export type UserCreateWithoutReportsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsInput = {
@@ -11734,6 +11898,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsInput = {
@@ -11816,6 +11981,7 @@ export type UserUpdateWithoutReportedItemsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedItemsInput = {
@@ -11882,6 +12048,7 @@ export type UserUncheckedUpdateWithoutReportedItemsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportsInput = {
@@ -11959,6 +12126,7 @@ export type UserUpdateWithoutReportsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsInput = {
@@ -12025,6 +12193,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChallengeProgressInput = {
@@ -12091,6 +12260,7 @@ export type UserCreateWithoutChallengeProgressInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChallengeProgressInput = {
@@ -12157,6 +12327,7 @@ export type UserUncheckedCreateWithoutChallengeProgressInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChallengeProgressInput = {
@@ -12239,6 +12410,7 @@ export type UserUpdateWithoutChallengeProgressInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChallengeProgressInput = {
@@ -12305,6 +12477,7 @@ export type UserUncheckedUpdateWithoutChallengeProgressInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutXpEventsInput = {
@@ -12371,6 +12544,7 @@ export type UserCreateWithoutXpEventsInput = {
   onboarding?: Prisma.UserOnboardingCreateNestedOneWithoutUserInput
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutXpEventsInput = {
@@ -12437,6 +12611,7 @@ export type UserUncheckedCreateWithoutXpEventsInput = {
   onboarding?: Prisma.UserOnboardingUncheckedCreateNestedOneWithoutUserInput
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutXpEventsInput = {
@@ -12519,6 +12694,7 @@ export type UserUpdateWithoutXpEventsInput = {
   onboarding?: Prisma.UserOnboardingUpdateOneWithoutUserNestedInput
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutXpEventsInput = {
@@ -12585,6 +12761,7 @@ export type UserUncheckedUpdateWithoutXpEventsInput = {
   onboarding?: Prisma.UserOnboardingUncheckedUpdateOneWithoutUserNestedInput
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLeaderboardEntriesInput = {
@@ -12651,6 +12828,7 @@ export type UserCreateWithoutLeaderboardEntriesInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLeaderboardEntriesInput = {
@@ -12717,6 +12895,7 @@ export type UserUncheckedCreateWithoutLeaderboardEntriesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLeaderboardEntriesInput = {
@@ -12799,6 +12978,7 @@ export type UserUpdateWithoutLeaderboardEntriesInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaderboardEntriesInput = {
@@ -12865,6 +13045,7 @@ export type UserUncheckedUpdateWithoutLeaderboardEntriesInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutHostedAudioRoomsInput = {
@@ -12931,6 +13112,7 @@ export type UserCreateWithoutHostedAudioRoomsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHostedAudioRoomsInput = {
@@ -12997,6 +13179,7 @@ export type UserUncheckedCreateWithoutHostedAudioRoomsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutHostedAudioRoomsInput = {
@@ -13079,6 +13262,7 @@ export type UserUpdateWithoutHostedAudioRoomsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHostedAudioRoomsInput = {
@@ -13145,6 +13329,7 @@ export type UserUncheckedUpdateWithoutHostedAudioRoomsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAudioParticipationsInput = {
@@ -13211,6 +13396,7 @@ export type UserCreateWithoutAudioParticipationsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAudioParticipationsInput = {
@@ -13277,6 +13463,7 @@ export type UserUncheckedCreateWithoutAudioParticipationsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAudioParticipationsInput = {
@@ -13359,6 +13546,7 @@ export type UserUpdateWithoutAudioParticipationsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAudioParticipationsInput = {
@@ -13425,6 +13613,7 @@ export type UserUncheckedUpdateWithoutAudioParticipationsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMediaAssetsInput = {
@@ -13491,6 +13680,7 @@ export type UserCreateWithoutMediaAssetsInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMediaAssetsInput = {
@@ -13557,6 +13747,7 @@ export type UserUncheckedCreateWithoutMediaAssetsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMediaAssetsInput = {
@@ -13639,6 +13830,7 @@ export type UserUpdateWithoutMediaAssetsInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaAssetsInput = {
@@ -13705,6 +13897,7 @@ export type UserUncheckedUpdateWithoutMediaAssetsInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOnboardingInput = {
@@ -13771,6 +13964,7 @@ export type UserCreateWithoutOnboardingInput = {
   userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOnboardingInput = {
@@ -13837,6 +14031,7 @@ export type UserUncheckedCreateWithoutOnboardingInput = {
   userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+  purchases?: Prisma.UserPurchaseUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOnboardingInput = {
@@ -13919,6 +14114,7 @@ export type UserUpdateWithoutOnboardingInput = {
   userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOnboardingInput = {
@@ -13985,6 +14181,291 @@ export type UserUncheckedUpdateWithoutOnboardingInput = {
   userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
+  purchases?: Prisma.UserPurchaseUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPurchasesInput = {
+  id?: string
+  email: string
+  username: string
+  name: string
+  passwordHash: string
+  avatar?: string | null
+  bannerImage?: string | null
+  bio?: string | null
+  location?: string | null
+  userRole?: $Enums.UserRole
+  workerRole?: $Enums.WorkerRole | null
+  level?: number
+  xp?: number
+  influenceScore?: number
+  realm?: string | null
+  isOnline?: boolean
+  lastSeen?: Date | string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  audioParticipations?: Prisma.AudioParticipantCreateNestedManyWithoutUserInput
+  hostedAudioRooms?: Prisma.AudioRoomCreateNestedManyWithoutHostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  bookmarkCollections?: Prisma.BookmarkCollectionCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  communitiesOwned?: Prisma.CommunityCreateNestedManyWithoutOwnerInput
+  communityMemberships?: Prisma.CommunityMemberCreateNestedManyWithoutUserInput
+  conversations1?: Prisma.ConversationCreateNestedManyWithoutUser1Input
+  conversations2?: Prisma.ConversationCreateNestedManyWithoutUser2Input
+  eventsOrganized?: Prisma.EventCreateNestedManyWithoutOrganizerInput
+  eventAttendances?: Prisma.EventAttendeeCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowCreateNestedManyWithoutFollowingInput
+  fusionLayers?: Prisma.FusionLayerCreateNestedManyWithoutAuthorInput
+  fusionPosts?: Prisma.FusionPostCreateNestedManyWithoutOwnerInput
+  fusionReactions?: Prisma.FusionReactionCreateNestedManyWithoutUserInput
+  leaderboardEntries?: Prisma.LeaderboardEntryCreateNestedManyWithoutUserInput
+  likes?: Prisma.LikeCreateNestedManyWithoutUserInput
+  mediaItems?: Prisma.MediaCreateNestedManyWithoutUserInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutUserInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutSenderInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  pollVotes?: Prisma.PollVoteCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
+  reportedItems?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  ownedRooms?: Prisma.RoomCreateNestedManyWithoutOwnerInput
+  roomMemberships?: Prisma.RoomMemberCreateNestedManyWithoutUserInput
+  roomMessages?: Prisma.RoomMessageCreateNestedManyWithoutAuthorInput
+  hostedSessions?: Prisma.RoomSessionCreateNestedManyWithoutHostInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  threadAuthored?: Prisma.ThreadCreateNestedManyWithoutAuthorInput
+  threadMessages?: Prisma.ThreadMessageCreateNestedManyWithoutAuthorInput
+  achievements?: Prisma.UserAchievementCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  onboarding?: Prisma.UserOnboardingCreateNestedOneWithoutUserInput
+  userPreference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  xpEvents?: Prisma.XPEventCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPurchasesInput = {
+  id?: string
+  email: string
+  username: string
+  name: string
+  passwordHash: string
+  avatar?: string | null
+  bannerImage?: string | null
+  bio?: string | null
+  location?: string | null
+  userRole?: $Enums.UserRole
+  workerRole?: $Enums.WorkerRole | null
+  level?: number
+  xp?: number
+  influenceScore?: number
+  realm?: string | null
+  isOnline?: boolean
+  lastSeen?: Date | string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  audioParticipations?: Prisma.AudioParticipantUncheckedCreateNestedManyWithoutUserInput
+  hostedAudioRooms?: Prisma.AudioRoomUncheckedCreateNestedManyWithoutHostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  bookmarkCollections?: Prisma.BookmarkCollectionUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  communitiesOwned?: Prisma.CommunityUncheckedCreateNestedManyWithoutOwnerInput
+  communityMemberships?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutUserInput
+  conversations1?: Prisma.ConversationUncheckedCreateNestedManyWithoutUser1Input
+  conversations2?: Prisma.ConversationUncheckedCreateNestedManyWithoutUser2Input
+  eventsOrganized?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
+  eventAttendances?: Prisma.EventAttendeeUncheckedCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowingInput
+  fusionLayers?: Prisma.FusionLayerUncheckedCreateNestedManyWithoutAuthorInput
+  fusionPosts?: Prisma.FusionPostUncheckedCreateNestedManyWithoutOwnerInput
+  fusionReactions?: Prisma.FusionReactionUncheckedCreateNestedManyWithoutUserInput
+  leaderboardEntries?: Prisma.LeaderboardEntryUncheckedCreateNestedManyWithoutUserInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutUserInput
+  mediaItems?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutUserInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  pollVotes?: Prisma.PollVoteUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
+  reportedItems?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  ownedRooms?: Prisma.RoomUncheckedCreateNestedManyWithoutOwnerInput
+  roomMemberships?: Prisma.RoomMemberUncheckedCreateNestedManyWithoutUserInput
+  roomMessages?: Prisma.RoomMessageUncheckedCreateNestedManyWithoutAuthorInput
+  hostedSessions?: Prisma.RoomSessionUncheckedCreateNestedManyWithoutHostInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  threadAuthored?: Prisma.ThreadUncheckedCreateNestedManyWithoutAuthorInput
+  threadMessages?: Prisma.ThreadMessageUncheckedCreateNestedManyWithoutAuthorInput
+  achievements?: Prisma.UserAchievementUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  onboarding?: Prisma.UserOnboardingUncheckedCreateNestedOneWithoutUserInput
+  userPreference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  xpEvents?: Prisma.XPEventUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPurchasesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+}
+
+export type UserUpsertWithoutPurchasesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPurchasesInput, Prisma.UserUncheckedUpdateWithoutPurchasesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPurchasesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPurchasesInput, Prisma.UserUncheckedUpdateWithoutPurchasesInput>
+}
+
+export type UserUpdateWithoutPurchasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bannerImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userRole?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  workerRole?: Prisma.NullableEnumWorkerRoleFieldUpdateOperationsInput | $Enums.WorkerRole | null
+  level?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  influenceScore?: Prisma.IntFieldUpdateOperationsInput | number
+  realm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSeen?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  audioParticipations?: Prisma.AudioParticipantUpdateManyWithoutUserNestedInput
+  hostedAudioRooms?: Prisma.AudioRoomUpdateManyWithoutHostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  bookmarkCollections?: Prisma.BookmarkCollectionUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  communitiesOwned?: Prisma.CommunityUpdateManyWithoutOwnerNestedInput
+  communityMemberships?: Prisma.CommunityMemberUpdateManyWithoutUserNestedInput
+  conversations1?: Prisma.ConversationUpdateManyWithoutUser1NestedInput
+  conversations2?: Prisma.ConversationUpdateManyWithoutUser2NestedInput
+  eventsOrganized?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
+  eventAttendances?: Prisma.EventAttendeeUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUpdateManyWithoutFollowingNestedInput
+  fusionLayers?: Prisma.FusionLayerUpdateManyWithoutAuthorNestedInput
+  fusionPosts?: Prisma.FusionPostUpdateManyWithoutOwnerNestedInput
+  fusionReactions?: Prisma.FusionReactionUpdateManyWithoutUserNestedInput
+  leaderboardEntries?: Prisma.LeaderboardEntryUpdateManyWithoutUserNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutUserNestedInput
+  mediaItems?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutUserNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutSenderNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  pollVotes?: Prisma.PollVoteUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
+  reportedItems?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  ownedRooms?: Prisma.RoomUpdateManyWithoutOwnerNestedInput
+  roomMemberships?: Prisma.RoomMemberUpdateManyWithoutUserNestedInput
+  roomMessages?: Prisma.RoomMessageUpdateManyWithoutAuthorNestedInput
+  hostedSessions?: Prisma.RoomSessionUpdateManyWithoutHostNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  threadAuthored?: Prisma.ThreadUpdateManyWithoutAuthorNestedInput
+  threadMessages?: Prisma.ThreadMessageUpdateManyWithoutAuthorNestedInput
+  achievements?: Prisma.UserAchievementUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  onboarding?: Prisma.UserOnboardingUpdateOneWithoutUserNestedInput
+  userPreference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  xpEvents?: Prisma.XPEventUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPurchasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bannerImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userRole?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  workerRole?: Prisma.NullableEnumWorkerRoleFieldUpdateOperationsInput | $Enums.WorkerRole | null
+  level?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  influenceScore?: Prisma.IntFieldUpdateOperationsInput | number
+  realm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSeen?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  audioParticipations?: Prisma.AudioParticipantUncheckedUpdateManyWithoutUserNestedInput
+  hostedAudioRooms?: Prisma.AudioRoomUncheckedUpdateManyWithoutHostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  bookmarkCollections?: Prisma.BookmarkCollectionUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  communitiesOwned?: Prisma.CommunityUncheckedUpdateManyWithoutOwnerNestedInput
+  communityMemberships?: Prisma.CommunityMemberUncheckedUpdateManyWithoutUserNestedInput
+  conversations1?: Prisma.ConversationUncheckedUpdateManyWithoutUser1NestedInput
+  conversations2?: Prisma.ConversationUncheckedUpdateManyWithoutUser2NestedInput
+  eventsOrganized?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
+  eventAttendances?: Prisma.EventAttendeeUncheckedUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUncheckedUpdateManyWithoutFollowingNestedInput
+  fusionLayers?: Prisma.FusionLayerUncheckedUpdateManyWithoutAuthorNestedInput
+  fusionPosts?: Prisma.FusionPostUncheckedUpdateManyWithoutOwnerNestedInput
+  fusionReactions?: Prisma.FusionReactionUncheckedUpdateManyWithoutUserNestedInput
+  leaderboardEntries?: Prisma.LeaderboardEntryUncheckedUpdateManyWithoutUserNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutUserNestedInput
+  mediaItems?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutUserNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  pollVotes?: Prisma.PollVoteUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
+  reportedItems?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  ownedRooms?: Prisma.RoomUncheckedUpdateManyWithoutOwnerNestedInput
+  roomMemberships?: Prisma.RoomMemberUncheckedUpdateManyWithoutUserNestedInput
+  roomMessages?: Prisma.RoomMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  hostedSessions?: Prisma.RoomSessionUncheckedUpdateManyWithoutHostNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  threadAuthored?: Prisma.ThreadUncheckedUpdateManyWithoutAuthorNestedInput
+  threadMessages?: Prisma.ThreadMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  achievements?: Prisma.UserAchievementUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  onboarding?: Prisma.UserOnboardingUncheckedUpdateOneWithoutUserNestedInput
+  userPreference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  xpEvents?: Prisma.XPEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -14034,6 +14515,7 @@ export type UserCountOutputType = {
   achievements: number
   badges: number
   xpEvents: number
+  purchases: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -14078,6 +14560,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   achievements?: boolean | UserCountOutputTypeCountAchievementsArgs
   badges?: boolean | UserCountOutputTypeCountBadgesArgs
   xpEvents?: boolean | UserCountOutputTypeCountXpEventsArgs
+  purchases?: boolean | UserCountOutputTypeCountPurchasesArgs
 }
 
 /**
@@ -14377,6 +14860,13 @@ export type UserCountOutputTypeCountXpEventsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.XPEventWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPurchasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserPurchaseWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -14443,6 +14933,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   userPreference?: boolean | Prisma.User$userPreferenceArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   xpEvents?: boolean | Prisma.User$xpEventsArgs<ExtArgs>
+  purchases?: boolean | Prisma.User$purchasesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -14561,6 +15052,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   userPreference?: boolean | Prisma.User$userPreferenceArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   xpEvents?: boolean | Prisma.User$xpEventsArgs<ExtArgs>
+  purchases?: boolean | Prisma.User$purchasesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -14613,6 +15105,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     userPreference: Prisma.$UserPreferencePayload<ExtArgs> | null
     settings: Prisma.$UserSettingsPayload<ExtArgs> | null
     xpEvents: Prisma.$XPEventPayload<ExtArgs>[]
+    purchases: Prisma.$UserPurchasePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -15073,6 +15566,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   userPreference<T extends Prisma.User$userPreferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userPreferenceArgs<ExtArgs>>): Prisma.Prisma__UserPreferenceClient<runtime.Types.Result.GetResult<Prisma.$UserPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__UserSettingsClient<runtime.Types.Result.GetResult<Prisma.$UserSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   xpEvents<T extends Prisma.User$xpEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$xpEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$XPEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchases<T extends Prisma.User$purchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPurchasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16548,6 +17042,30 @@ export type User$xpEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.XPEventScalarFieldEnum | Prisma.XPEventScalarFieldEnum[]
+}
+
+/**
+ * User.purchases
+ */
+export type User$purchasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserPurchase
+   */
+  select?: Prisma.UserPurchaseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserPurchase
+   */
+  omit?: Prisma.UserPurchaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserPurchaseInclude<ExtArgs> | null
+  where?: Prisma.UserPurchaseWhereInput
+  orderBy?: Prisma.UserPurchaseOrderByWithRelationInput | Prisma.UserPurchaseOrderByWithRelationInput[]
+  cursor?: Prisma.UserPurchaseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserPurchaseScalarFieldEnum | Prisma.UserPurchaseScalarFieldEnum[]
 }
 
 /**

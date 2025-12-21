@@ -1,5 +1,6 @@
-
 import { type NextRequest, NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+import { verifyToken } from "@/lib/auth"
 
 // GET /api/rooms/[id]/messages - Get room messages
 export async function GET(
@@ -7,24 +8,56 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params
-    
-    // Mock messages
-    const messages = [
-      {
-        id: "msg-1",
-        roomId: id,
-        userId: "current-user",
-        username: "alexchen",
-        avatar: "/professional-man-avatar.png",
-        content: "Ready to play!",
-        createdAt: new Date(Date.now() - 60000)
+    const { id: roomId } = await context.params
+    const authHeader = request.headers.get("authorization")
+    let userId: string | null = null
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.substring(7)
+      const decoded = await verifyToken(token)
+      if (decoded) {
+        userId = decoded.userId
       }
-    ]
-    
+    }
+
+    // Verify user is a member (optional for public rooms)
+    if (userId) {
+      const member = await prisma.roomMember.findUnique({
+        where: {
+          roomId_userId: {
+            roomId,
+            userId,
+          },
+        },
+      })
+
+      // Allow viewing messages even if not a member for public rooms
+    }
+
+    const messages = await prisma.roomMessage.findMany({
+      where: { roomId },
+      orderBy: { createdAt: "asc" },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+      take: 100,
+    })
+
     return NextResponse.json({
       success: true,
-      data: messages
+      data: messages.map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        user: msg.author,
+        createdAt: msg.createdAt,
+      })),
     })
   } catch (error) {
     console.error("Error fetching messages:", error)
@@ -41,23 +74,78 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params
-    const body = await request.json()
-    const { content, userId } = body
+    const { id: roomId } = await context.params
+    const authHeader = request.headers.get("authorization")
     
-    const newMessage = {
-      id: `msg-${Date.now()}`,
-      roomId: id,
-      userId: userId || "current-user",
-      username: "currentuser",
-      avatar: "/placeholder-user.jpg",
-      content,
-      createdAt: new Date()
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ success: false, error: "Authentication required" }, { status: 401 })
     }
+
+    const token = authHeader.substring(7)
+    const decoded = await verifyToken(token)
     
+    if (!decoded) {
+      return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { content, anonymousName } = body
+
+    if (!content || !content.trim()) {
+      return NextResponse.json({ success: false, error: "Message content required" }, { status: 400 })
+    }
+
+    // Check if user is a member
+    const member = await prisma.roomMember.findUnique({
+      where: {
+        roomId_userId: {
+          roomId,
+          userId: decoded.userId,
+        },
+      },
+    })
+
+    if (!member) {
+      return NextResponse.json({ success: false, error: "Not a member of this room" }, { status: 403 })
+    }
+
+    // Check if room has anonymous mode
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+      select: { anonymousMode: true },
+    })
+
+    // Create message
+    const message = await prisma.roomMessage.create({
+      data: {
+        roomId,
+        authorId: decoded.userId,
+        content: content.trim(),
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    })
+
+    // For anonymous rooms, use the provided anonymous name
+    const displayName = room?.anonymousMode && anonymousName ? anonymousName : null
+
     return NextResponse.json({
       success: true,
-      data: newMessage
+      data: {
+        id: message.id,
+        content: message.content,
+        user: message.author,
+        anonymousName: displayName,
+        createdAt: message.createdAt,
+      },
     }, { status: 201 })
   } catch (error) {
     console.error("Error sending message:", error)
