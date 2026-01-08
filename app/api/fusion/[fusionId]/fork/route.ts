@@ -90,6 +90,9 @@ export async function POST(
       data: { forkCount: { increment: 1 } }
     })
 
+    // Update challenge progress
+    await updateChallengeProgress(decoded.userId, 'fork_fusion')
+
     return NextResponse.json({
       success: true,
       data: {

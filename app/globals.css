@@ -33,6 +33,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius: 1rem;
   --mood-active: oklch(0.45 0.15 180);
   --mood-chill: oklch(0.5 0.08 250);
   --mood-debate: oklch(0.55 0.12 20);
@@ -47,6 +48,16 @@
   --sidebar-accent-foreground: oklch(0.15 0 0);
   --sidebar-border: oklch(0.92 0 0);
   --sidebar-ring: oklch(0.45 0.15 180);
+
+  /* Existing cinematic motion timing variables */
+  --timing-instant: 0.15s;
+  --timing-fast: 0.3s;
+  --timing-normal: 0.5s;
+  --timing-slow: 0.8s;
+  --timing-cinematic: 1.2s;
+  --ease-magnetic: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-liquid: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Gojo Theme - Blue and White */
@@ -384,6 +395,21 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-text-reveal: text-reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  /* Added new immersive animation tokens */
+  --animate-magnetic: magnetic 0.3s var(--ease-magnetic);
+  --animate-ripple: ripple 0.8s ease-out forwards;
+  --animate-breath: breath 4s ease-in-out infinite;
+  --animate-drift: drift 8s ease-in-out infinite;
+  --animate-status-pulse: status-pulse 2s ease-in-out infinite;
+
+  /* Defining glass utilities as utility tokens for Tailwind V4 */
+  --background-glass: var(--card);
+  --backdrop-blur-glass: blur(24px);
+  --border-glass: 1px solid oklch(1 0 0 / 0.1);
+  --shadow-glass: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 }
 
 @layer base {
@@ -650,6 +676,248 @@
     }
   }
 }
+
+/* Enhanced animation keyframes for deeper immersion */
+@keyframes magnetic {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes breath {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 0.9;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+  33% {
+    transform: translateX(10px) translateY(-10px);
+  }
+  66% {
+    transform: translateX(-10px) translateY(10px);
+  }
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(var(--primary), 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.6), 0 0 40px rgba(var(--primary), 0.3);
+    transform: scale(1.02);
+  }
+}
+
+/* Merged user's animation keyframes into the base layer */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground selection:bg-primary/30;
+    overflow-x: hidden;
+  }
+  @keyframes slideUnderline {
+    from {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    to {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  @keyframes popIn {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes floatEmoji {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-30px) rotate(15deg);
+      opacity: 0;
+    }
+  }
+}
+
+/* Integrated user's utility classes (glass, neon-glow, scrollbar-hide, etc.) */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 10px var(--primary), 0 0 20px color-mix(in oklch, var(--primary) 50%, transparent);
+  }
+
+  .glass {
+    background: color-mix(in oklch, var(--card) 80%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .glass-strong {
+    background: color-mix(in oklch, var(--card) 90%, transparent);
+    backdrop-filter: blur(20px);
+  }
+
+  /* Defining glass class using standard CSS to avoid @apply issues */
+  .glass {
+    background: var(--background-glass);
+    backdrop-filter: var(--backdrop-blur-glass);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* Defining glass-liquid using standard CSS */
+  .glass-liquid {
+    background: var(--background-glass);
+    backdrop-filter: var(--backdrop-blur-glass);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-glass);
+    transition: all var(--timing-normal) var(--ease-liquid);
+  }
+
+  .glass-liquid:hover {
+    border-color: oklch(var(--primary) / 0.3);
+    background: oklch(0.1 0.03 260 / 0.8);
+    box-shadow: 0 0 30px rgba(var(--primary), 0.15), 0 20px 50px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Magnetic button interaction */
+  .btn-magnetic {
+    transition: all var(--timing-fast) var(--ease-magnetic);
+    position: relative;
+  }
+
+  .btn-magnetic:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(var(--primary), 0.4);
+  }
+
+  .btn-magnetic:active {
+    transform: translateY(0px);
+  }
+
+  /* Cursor ripple effect container */
+  .cursor-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cursor-ripple::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(var(--primary), 0.4), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--timing-instant);
+  }
+
+  .cursor-ripple:hover::after {
+    animation: ripple 0.8s ease-out;
+  }
+
+  .neon-glow-primary {
+    box-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary);
+  }
+
+  /* Enhanced text gradient with animation support */
+  .text-gradient {
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Living status indicator styles */
+  .status-live {
+    animation: status-pulse 2s ease-in-out infinite;
+    backdrop-filter: blur(20px);
+  }
+
+  /* Energy meter glow effect */
+  .energy-glow {
+    position: relative;
+  }
+
+  .energy-glow::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+    animation: breath 4s ease-in-out infinite;
+  }
+}
+
 
 @layer utilities {
   .slide-underline {

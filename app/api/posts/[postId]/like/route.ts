@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyToken } from "@/lib/auth"
+import { updateChallengeProgress } from "@/lib/challenges"
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ postId: string }> }) {
   try {

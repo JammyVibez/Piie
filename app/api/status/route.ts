@@ -212,6 +212,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Update challenge progress
+    await updateChallengeProgress(decoded.userId, 'create_story')
+
     return NextResponse.json({ success: true, data: story }, { status: 201 })
   } catch (error) {
     console.error('[Status API] Error:', error)

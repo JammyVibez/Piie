@@ -33,6 +33,11 @@ export async function GET(request: NextRequest) {
 
     if (type) {
       where.postType = type
+    } else {
+      // Exclude 'media' type which is used for stories/status
+      where.postType = {
+        not: 'media'
+      }
     }
 
     if (tag) {
@@ -276,6 +281,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update challenge progress
+    await updateChallengeProgress(decoded.userId, 'create_post')
 
     const formattedPost = {
       id: post.id,

@@ -30,6 +30,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { PostCard } from "@/components/post-card"
 import type { Post } from "@/components/types"
 import { formatRelativeTime } from "@/lib/utils-format"
+import { useAuth } from "@/contexts/auth-context"
 
 interface BookmarkCollection {
   id: string
@@ -48,6 +49,7 @@ const defaultCollections: BookmarkCollection[] = [
 ]
 
 export default function BookmarksPage() {
+  const { token } = useAuth()
   const [bookmarkedPosts, setBookmarkedPosts] = useState<Post[]>([])
   const [collections, setCollections] = useState<BookmarkCollection[]>(defaultCollections)
   const [activeCollection, setActiveCollection] = useState("all")
@@ -61,13 +63,14 @@ export default function BookmarksPage() {
   const [isSelecting, setIsSelecting] = useState(false)
 
   useEffect(() => {
-    fetchBookmarks()
-  }, [])
+    if (token) {
+      fetchBookmarks()
+    }
+  }, [token])
 
   const fetchBookmarks = async () => {
     setIsLoading(true)
     try {
-      const token = localStorage.getItem("auth_token")
       const headers: Record<string, string> = {}
       if (token) {
         headers.Authorization = `Bearer ${token}`

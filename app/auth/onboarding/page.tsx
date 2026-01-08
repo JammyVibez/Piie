@@ -92,10 +92,10 @@ export default function OnboardingPage() {
       }
     }
 
-        loadData()
-    }, [router])
+    loadData()
+  }, [router, token, authLoading])
 
-    // Realtime subscription for user updates
+  // Realtime subscription for user updates
     useEffect(() => {
       if (!currentUser?.id) return
 

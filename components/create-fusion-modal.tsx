@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useAuth } from "@/contexts/auth-context"
 import {
   Sparkles,
   Image as ImageIcon,
@@ -66,7 +67,6 @@ export function CreateFusionModal({ isOpen, onClose, onSubmit }: CreateFusionMod
   const handleSubmit = async () => {
     if (!title.trim() || !seedContent.trim()) return
 
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
     if (!token) {
       console.error("No auth token found")
       return

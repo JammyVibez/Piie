@@ -207,40 +207,40 @@ export function MainFeed() {
             <span className="hidden sm:inline">Create</span>
           </Button>
         </div>
-
-        <div className="border-t border-border/50 p-4">
-          <div className="max-w-2xl mx-auto mb-4">
-            <StoryCarousel />
-          </div>
-
-          <div
-            className="max-w-2xl mx-auto flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-gradient-to-r from-muted/20 to-muted/30 hover:from-primary/10 hover:to-secondary/10 transition-all border border-border/50 hover:border-primary/30"
-            onClick={() => setShowCreateModal(true)}
-          >
-            <Avatar className="h-10 w-10 ring-2 ring-primary/30">
-              <AvatarImage src={currentUser?.avatar || "/placeholder.svg?height=40&width=40"} />
-              <AvatarFallback>{currentUser?.name?.[0] || "Y"}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 text-muted-foreground hover:text-foreground transition-colors">
-              What&apos;s on your mind?
-            </div>
-            <div className="flex gap-2">
-              <button className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-primary">
-                <ImageIcon size={18} />
-              </button>
-              <button className="p-2 hover:bg-secondary/10 rounded-lg transition-colors text-secondary">
-                <Video size={18} />
-              </button>
-              <button className="p-2 hover:bg-accent/10 rounded-lg transition-colors text-accent">
-                <Sparkles size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         <div className="max-w-2xl mx-auto w-full p-4 space-y-6">
+          <div className="mb-4">
+            <div className="mb-4">
+              <StoryCarousel />
+            </div>
+
+            <div
+              className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-gradient-to-r from-muted/20 to-muted/30 hover:from-primary/10 hover:to-secondary/10 transition-all border border-border/50 hover:border-primary/30"
+              onClick={() => setShowCreateModal(true)}
+            >
+              <Avatar className="h-10 w-10 ring-2 ring-primary/30">
+                <AvatarImage src={currentUser?.avatar || "/placeholder.svg?height=40&width=40"} />
+                <AvatarFallback>{currentUser?.name?.[0] || "Y"}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 text-muted-foreground hover:text-foreground transition-colors">
+                What&apos;s on your mind?
+              </div>
+              <div className="flex gap-2">
+                <button className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-primary">
+                  <ImageIcon size={18} />
+                </button>
+                <button className="p-2 hover:bg-secondary/10 rounded-lg transition-colors text-secondary">
+                  <Video size={18} />
+                </button>
+                <button className="p-2 hover:bg-accent/10 rounded-lg transition-colors text-accent">
+                  <Sparkles size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="bg-card border border-border/50 rounded-xl p-4 space-y-4 animate-pulse">
@@ -264,43 +264,6 @@ export function MainFeed() {
                 <FusionPostCard
                   key={fusionPost.id}
                   fusionPost={fusionPost}
-                  onAddLayer={() => {
-                    if (!user) {
-                      alert("Please login to add layers")
-                      return
-                    }
-                    const layerType = prompt("Enter layer type (text/image/video/voice/draw/sticker/overlay):")
-                    if (!layerType) return
-                    const content = prompt("Enter layer content:")
-                    if (!content) return
-                    
-                    fetch(`/api/fusion/${fusionPost.id}/layers`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({
-                        type: layerType,
-                        content: content,
-                        positionX: 0,
-                        positionY: 0,
-                      }),
-                    })
-                      .then((res) => res.json())
-                      .then((result) => {
-                        if (result.success) {
-                          alert("Layer added successfully!")
-                          window.location.reload()
-                        } else {
-                          alert("Failed to add layer")
-                        }
-                      })
-                      .catch((err) => {
-                        console.error("Error adding layer:", err)
-                        alert("Failed to add layer")
-                      })
-                  }}
                 />
               ))}
 
@@ -320,10 +283,6 @@ export function MainFeed() {
                     key={post.id} 
                     post={post} 
                     onComment={() => setSelectedPostForComment(post)}
-                    onLike={() => console.log("Like post:", post.id)}
-                    onRepost={() => console.log("Repost post:", post.id)}
-                    onShare={() => console.log("Share post:", post.id)}
-                    onBookmark={() => console.log("Bookmark post:", post.id)}
                   />
                 ))
               )}

@@ -43,6 +43,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       data: { shares: { increment: 1 } }
     })
 
+    // Update challenge progress
+    await updateChallengeProgress(decoded.userId, 'share_post')
+
     return NextResponse.json({ success: true, data: repost })
   } catch (error) {
     console.error('[Repost API] Error:', error)

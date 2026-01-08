@@ -44,7 +44,6 @@ export default function AdminDashboard({ communityId, isAdmin }: AdminDashboardP
   useEffect(() => {
     const fetchModerationData = async () => {
       try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
         if (!token) return
 
         const response = await fetch(`/api/communities/${communityId}/moderation`, {
@@ -68,10 +67,9 @@ export default function AdminDashboard({ communityId, isAdmin }: AdminDashboardP
     } else {
       setIsLoading(false)
     }
-  }, [communityId, isAdmin])
+  }, [communityId, isAdmin, token])
 
   const handleBanUser = async (userId: string) => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
     if (!token) return
 
     try {
@@ -108,7 +106,6 @@ export default function AdminDashboard({ communityId, isAdmin }: AdminDashboardP
   }
 
   const handleResolveAction = async (actionId: string) => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
     if (!token) return
 
     try {

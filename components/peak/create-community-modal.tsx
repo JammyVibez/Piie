@@ -33,24 +33,6 @@ export default function CreateCommunityModal({ onClose, onCreate, onCreateCommun
     e.preventDefault()
     if (formData.name.trim()) {
       try {
-        // Try to get token from localStorage with correct key
-        let token = localStorage.getItem('auth_token')
-        
-        // If not in localStorage, try alternate key
-        if (!token) {
-          token = localStorage.getItem('token')
-        }
-        
-        // If still not found, try to get from cookies
-        if (!token) {
-          const cookies = document.cookie.split(';')
-          const tokenCookie = cookies.find(c => c.trim().startsWith('auth_token=')) || 
-                              cookies.find(c => c.trim().startsWith('token='))
-          if (tokenCookie) {
-            token = tokenCookie.split('=')[1]
-          }
-        }
-        
         if (!token) {
           alert('Please log in to create a community')
           window.location.href = '/auth/login'

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { formatRelativeTime } from "@/lib/utils-format"
 import Link from "next/link"
+import { useAuth } from "@/contexts/auth-context"
 
 interface Notification {
   id: string
@@ -138,14 +139,14 @@ export default function NotificationsPage() {
   }
 
   const markAllAsRead = async () => {
-    if (!tokenRef.current) return
+    if (!token) return
 
     try {
       await fetch("/api/notifications", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenRef.current}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ markAllRead: true }),
       })

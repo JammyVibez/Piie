@@ -42,6 +42,9 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, variant = "default", onComment }: PostCardProps) {
+  const { user: currentUser, token } = useAuth()
+  const currentUserId = currentUser?.id || null
+
   const [isLiked, setIsLiked] = useState(post.isLiked || false)
   const [likeCount, setLikeCount] = useState(post.likes)
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false)
@@ -50,26 +53,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
   const [shareCount, setShareCount] = useState(post.shares || 0)
   const [isReposted, setIsReposted] = useState(post.isReposted || false)
   const [repostCount, setRepostCount] = useState(post.reposts || 0)
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
-
-  // Get current user ID on mount
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      fetch('/api/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-        .then(res => res.json())
-        .then(result => {
-          if (result.success && result.data) {
-            setCurrentUserId(result.data.id)
-          }
-        })
-        .catch(err => console.error('Failed to get current user:', err))
-    }
-  }, [])
 
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
@@ -84,7 +67,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
 
   const handleLike = async () => {
     try {
-      const token = localStorage.getItem('token')
       if (!token) {
         console.error('Not authenticated')
         return
@@ -121,7 +103,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
 
   const handleRepost = async () => {
     try {
-      const token = localStorage.getItem('token')
       if (!token) {
         console.error('Not authenticated')
         return
@@ -150,7 +131,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
 
   const handleShare = async () => {
     try {
-      const token = localStorage.getItem('token')
       const shareUrl = `${window.location.origin}/post/${post.id}`
 
       if (token) {
@@ -354,7 +334,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
               size="sm"
               onClick={async () => {
                 try {
-                  const token = localStorage.getItem('token')
                   if (!token) {
                     console.error('Not authenticated')
                     return
@@ -407,7 +386,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
                   <DropdownMenuItem className="gap-2 text-destructive" onClick={async () => {
                     if (!confirm('Are you sure you want to delete this post?')) return
                     try {
-                      const token = localStorage.getItem('token')
                       const response = await fetch(`/api/posts/${post.id}`, {
                         method: 'DELETE',
                         headers: {
@@ -432,7 +410,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="gap-2" onClick={async () => {
                     try {
-                      const token = localStorage.getItem('token')
                       const response = await fetch(`/api/users/${post.author.id}/follow`, {
                         method: isFollowing ? 'DELETE' : 'POST',
                         headers: {
@@ -461,7 +438,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
                     }
 
                     try {
-                      const token = localStorage.getItem('token')
                       const response = await fetch('/api/reports', {
                         method: 'POST',
                         headers: {
@@ -730,7 +706,6 @@ export function PostCard({ post, variant = "default", onComment }: PostCardProps
           onClick={async (e) => {
             e.stopPropagation()
             try {
-              const token = localStorage.getItem('token')
               if (!token) {
                 console.error('Not authenticated')
                 return

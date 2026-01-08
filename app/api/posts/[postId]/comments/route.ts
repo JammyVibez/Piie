@@ -147,6 +147,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       data: { commentsCount: { increment: 1 } },
     })
 
+    // Update challenge progress
+    await updateChallengeProgress(decoded.userId, 'comment_post')
+
     // Create notification for post author (if not commenting on own post)
     if (post.authorId !== decoded.userId) {
       await prisma.notification.create({

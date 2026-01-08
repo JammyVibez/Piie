@@ -102,6 +102,7 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) {
+  const { token, user } = useAuth()
   const { toast } = useToast()
   const [currentLayerIndex, setCurrentLayerIndex] = useState(0)
   // Local editable copy of layers so added layers appear immediately
@@ -171,7 +172,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
 
   // Helper to submit new layer (fallback internal flow)
   const submitNewLayer = async () => {
-    const token = localStorage.getItem("auth_token")
     if (!token) {
       toast({
         title: "Authentication required",
@@ -260,7 +260,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   // Load real-time data on mount
   useEffect(() => {
     const loadRealtimeData = async () => {
-      const token = localStorage.getItem("auth_token")
       if (!token) {
         // Still load public data for unregistered users
         try {
@@ -433,7 +432,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   }
 
   const handleLike = async () => {
-    const token = localStorage.getItem("auth_token")
     if (!token) {
       toast({
         title: "Authentication required",
@@ -477,7 +475,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   }
 
   const handleBookmark = async () => {
-    const token = localStorage.getItem("auth_token")
     if (!token) {
       toast({
         title: "Authentication required",
@@ -534,7 +531,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
           url: `${window.location.origin}/fusion/${fusionPost.id}`,
         })
         // Track share
-        const token = localStorage.getItem("auth_token")
         if (token) {
           fetch(`/api/fusion/${fusionPost.id}/share`, {
             method: "POST",
@@ -550,7 +546,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
   }
 
   const handleFork = async () => {
-    const token = localStorage.getItem("auth_token")
     if (!token) {
       toast({
         title: "Authentication required",
@@ -848,7 +843,6 @@ export function FusionPostCard({ fusionPost, onAddLayer }: FusionPostCardProps) 
               size="sm" 
               className="gap-2 hover:scale-110 transition-transform"
               onClick={() => {
-                const token = localStorage.getItem("auth_token")
                 if (!token) {
                   toast({
                     title: "Authentication required",

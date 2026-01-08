@@ -31,7 +31,6 @@ export function MessageInput({ onSend, communityId, isLoading = false }: Message
   const handleSend = async () => {
     if (!message.trim() && attachments.length === 0) return
 
-    const token = localStorage.getItem("auth_token")
     if (!token) {
       alert("Please login to send messages")
       return

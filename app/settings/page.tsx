@@ -152,7 +152,7 @@ interface SettingsState {
 }
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const [activeTab, setActiveTab] = useState("profile")
   const [isSaving, setIsSaving] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -199,8 +199,6 @@ export default function SettingsPage() {
     language: "en",
     timezone: "America/Los_Angeles",
   })
-
-  const token = typeof window !== 'undefined' ? localStorage.getItem("auth_token") : null;
 
   useEffect(() => {
     if (user) {
