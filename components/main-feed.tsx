@@ -42,18 +42,29 @@ export function MainFeed() {
       }
 
       const response = await fetch(`/api/posts?page=${pageNum}&limit=10&sort=recent`, { headers })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.status}`)
+      }
+
       const result = await response.json()
 
-      if (result.success) {
+      if (result.success && result.data) {
         if (append) {
           setPosts((prev) => [...prev, ...result.data.items])
         } else {
-          setPosts(result.data.items)
+          setPosts(result.data.items || [])
         }
-        setHasMore(result.data.hasMore)
+        setHasMore(result.data.hasMore ?? false)
+      } else {
+        console.error("Failed to load posts:", result.error)
+        setPosts([])
+        setHasMore(false)
       }
     } catch (error) {
       console.error("Failed to load posts:", error)
+      setPosts([])
+      setHasMore(false)
     }
   }, [])
 
@@ -65,13 +76,22 @@ export function MainFeed() {
       }
 
       const response = await fetch("/api/fusion?limit=5", { headers })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch fusion posts: ${response.status}`)
+      }
+
       const result = await response.json()
 
-      if (result.success) {
-        setFusionPosts(result.data.items)
+      if (result.success && result.data) {
+        setFusionPosts(result.data.items || [])
+      } else {
+        console.error("Failed to load fusion posts:", result.error)
+        setFusionPosts([])
       }
     } catch (error) {
       console.error("Failed to load fusion posts:", error)
+      setFusionPosts([])
     }
   }, [])
 
@@ -80,13 +100,19 @@ export function MainFeed() {
     hasLoadedRef.current = true
 
     const loadData = async () => {
-      setIsLoading(true)
-      await Promise.all([loadPosts(1), loadFusionPosts()])
-      setIsLoading(false)
+      try {
+        setIsLoading(true)
+        await Promise.all([loadPosts(1), loadFusionPosts()])
+      } catch (error) {
+        console.error("Failed to load feed data:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadData()
-  }, [loadPosts, loadFusionPosts])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run once on mount
 
   const handleCommentClick = (post: Post) => {
     setSelectedPost(post)

@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/contexts/auth-context"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
 import "./globals.css"
 // Import PWAInstallPrompt component for PWA installation prompt
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
@@ -78,13 +79,15 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="peakit" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-        {/* Render PWAInstallPrompt component */}
-        <PWAInstallPrompt />
-        <WhatsNewDialog />
-        <Analytics />
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+          {/* Render PWAInstallPrompt component */}
+          <PWAInstallPrompt />
+          <WhatsNewDialog />
+          <Analytics />
+        </ErrorBoundary>
       </body>
     </html>
   )

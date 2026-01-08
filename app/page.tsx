@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Header } from "@/components/header"
@@ -10,15 +10,18 @@ import { RightSidebar } from "@/components/right-sidebar"
 import CommunitiesView from "@/components/peak/communities-page"
 
 export default function Home() {
-  const { user, loading } = useAuth()
+  const { user, isLoading } = useAuth()
   const router = useRouter()
   const [activeView, setActiveView] = useState<"home" | "communities">("home")
+  const hasRedirected = useRef(false)
 
   useEffect(() => {
-    if (!loading && !user) {
+    // Only redirect once when auth state is determined
+    if (!isLoading && !user && !hasRedirected.current) {
+      hasRedirected.current = true
       router.push("/landing")
     }
-  }, [user, loading, router])
+  }, [user, isLoading, router])
 
   return (
     <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
