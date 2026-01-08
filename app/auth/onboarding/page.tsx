@@ -93,7 +93,7 @@ export default function OnboardingPage() {
     }
 
     loadData()
-  }, [router, token, authLoading])
+  }, [router])
 
   // Realtime subscription for user updates
     useEffect(() => {
