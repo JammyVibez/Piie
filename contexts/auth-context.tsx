@@ -55,6 +55,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   const loadUser = useCallback(async () => {
+    // Only access localStorage in browser environment
+    if (typeof window === "undefined") {
+      setIsLoading(false)
+      return
+    }
+
     // Check both localStorage and cookies for token
     const storedToken = localStorage.getItem("auth_token") || 
       (typeof document !== "undefined" ? document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1] : null)
@@ -76,21 +82,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.success) {
           setUser(data.data.user)
           setToken(storedToken)
-          localStorage.setItem("auth_token", storedToken)
-          localStorage.setItem("auth_user", JSON.stringify(data.data.user))
+          if (typeof window !== "undefined") {
+            localStorage.setItem("auth_token", storedToken)
+            localStorage.setItem("auth_user", JSON.stringify(data.data.user))
+          }
         } else {
           // Only clear if explicitly failed with success: false (e.g. invalid token)
           console.warn("User validation failed:", data.error)
-          localStorage.removeItem("auth_token")
-          localStorage.removeItem("auth_user")
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("auth_token")
+            localStorage.removeItem("auth_user")
+          }
           if (typeof document !== "undefined") {
             document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
           }
         }
       } else if (response.status === 401 || response.status === 403) {
         // Only clear on auth errors
-        localStorage.removeItem("auth_token")
-        localStorage.removeItem("auth_user")
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth_token")
+          localStorage.removeItem("auth_user")
+        }
         if (typeof document !== "undefined") {
           document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
         }
@@ -105,6 +117,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    // Only access localStorage in browser environment
+    if (typeof window === "undefined") {
+      loadUser()
+      return
+    }
+
     // Try to load user from local storage first for immediate feedback
     const storedUser = localStorage.getItem("auth_user")
     if (storedUser) {
@@ -132,8 +150,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success) {
         setUser(data.data.user)
         setToken(data.data.token)
-        localStorage.setItem("auth_token", data.data.token)
-        localStorage.setItem("auth_user", JSON.stringify(data.data.user))
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth_token", data.data.token)
+          localStorage.setItem("auth_user", JSON.stringify(data.data.user))
+        }
         return { success: true }
       } else {
         return { success: false, error: data.error }
@@ -159,8 +179,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success) {
         setUser(data.data.user)
         setToken(data.data.token)
-        localStorage.setItem("auth_token", data.data.token)
-        localStorage.setItem("auth_user", JSON.stringify(data.data.user))
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth_token", data.data.token)
+          localStorage.setItem("auth_user", JSON.stringify(data.data.user))
+        }
         // Cookie is set by the server, but ensure it's also accessible
         if (typeof document !== "undefined") {
           document.cookie = `auth_token=${data.data.token}; max-age=${60 * 60 * 24 * 7}; path=/; SameSite=Lax`
@@ -190,8 +212,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setUser(null)
       setToken(null)
-      localStorage.removeItem("auth_token")
-      localStorage.removeItem("auth_user")
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth_token")
+        localStorage.removeItem("auth_user")
+      }
       if (typeof document !== "undefined") {
         document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
       }
