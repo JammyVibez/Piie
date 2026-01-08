@@ -1658,18 +1658,19 @@ export default function DMPage() {
                         className="pr-12 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/50 rounded-2xl min-h-[44px] max-h-32 resize-none"
                         rows={1}
                       />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
-                      onClick={() => {
-                        setShowEmojiPicker(!showEmojiPicker)
-                        setShowGifPicker(false)
-                        setShowStickerPicker(false)
-                      }}
-                    >
-                      <Smile size={20} className="text-muted-foreground" />
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                        onClick={() => {
+                          setShowEmojiPicker(!showEmojiPicker)
+                          setShowGifPicker(false)
+                          setShowStickerPicker(false)
+                        }}
+                      >
+                        <Smile size={20} className="text-muted-foreground" />
+                      </Button>
+                    </div>
 
                     {/* Emoji Picker */}
                     {showEmojiPicker && (
@@ -1731,26 +1732,26 @@ export default function DMPage() {
                                 ))}
                               </div>
                             )}
-                            {gifNextPos && !gifLoading && (
-                              <div className="flex justify-center pt-4">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={loadMoreGIFs}
-                                  disabled={gifLoading}
-                                >
-                                  {gifLoading ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                      Loading...
-                                    </>
-                                  ) : (
-                                    "Load More"
-                                  )}
-                                </Button>
-                              </div>
-                            )}
                           </div>
+                          {gifNextPos && !gifLoading && (
+                            <div className="flex justify-center pt-2 border-t border-border/50">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={loadMoreGIFs}
+                                disabled={gifLoading}
+                              >
+                                {gifLoading ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    Loading...
+                                  </>
+                                ) : (
+                                  "Load More"
+                                )}
+                              </Button>
+                            </div>
+                          )}
                           <p className="text-xs text-muted-foreground text-center">Powered by Tenor</p>
                         </div>
                       </div>
