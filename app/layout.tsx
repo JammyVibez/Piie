@@ -79,15 +79,15 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="peakit" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <ErrorBoundary>
-          <AuthProvider>
+        <AuthProvider>
+          <ErrorBoundary>
             {children}
-          </AuthProvider>
-          {/* Render PWAInstallPrompt component */}
-          <PWAInstallPrompt />
-          <WhatsNewDialog />
-          <Analytics />
-        </ErrorBoundary>
+            {/* Render PWAInstallPrompt component */}
+            <PWAInstallPrompt />
+            <WhatsNewDialog />
+            <Analytics />
+          </ErrorBoundary>
+        </AuthProvider>
       </body>
     </html>
   )

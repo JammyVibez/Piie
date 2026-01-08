@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -52,6 +53,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import { Loader2 } from "lucide-react"
+import { searchGifs, getTrendingGifs, type TenorGif } from "@/lib/tenor-api"
 
 // Emoji picker data
 const quickEmojis = ["👍", "❤️", "😂", "😮", "😢", "🔥", "🎉", "👏"]
@@ -723,14 +725,18 @@ export default function DMPage() {
   const [showGifPicker, setShowGifPicker] = useState(false)
   const [showStickerPicker, setShowStickerPicker] = useState(false)
   const [gifSearchQuery, setGifSearchQuery] = useState("")
-  const [gifs, setGifs] = useState<any[]>([])
+  const [gifs, setGifs] = useState<TenorGif[]>([])
+  const [gifLoading, setGifLoading] = useState(false)
+  const [gifNextPos, setGifNextPos] = useState<string | undefined>(undefined)
   const [chatWallpaper, setChatWallpaper] = useState("default")
   const [isLoadingConversations, setIsLoadingConversations] = useState(true)
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [suggestedUsers, setSuggestedUsers] = useState<User[]>([])
   const [editingMessage, setEditingMessage] = useState<Message | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [linkPreview, setLinkPreview] = useState<{ url: string; title?: string; description?: string; image?: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const loadConversations = useCallback(async () => {
@@ -806,9 +812,78 @@ export default function DMPage() {
 
   // Load wallpaper preference
   useEffect(() => {
-    const saved = localStorage.getItem("chat-wallpaper") || "default"
-    setChatWallpaper(saved)
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("chat-wallpaper") || "default"
+      setChatWallpaper(saved)
+    }
   }, [])
+
+  // Load GIFs when picker opens
+  useEffect(() => {
+    if (showGifPicker) {
+      loadGIFs()
+    }
+  }, [showGifPicker])
+
+  // Load GIFs based on search query
+  useEffect(() => {
+    if (showGifPicker && gifSearchQuery) {
+      const timeoutId = setTimeout(() => {
+        searchGIFs(gifSearchQuery)
+      }, 500)
+      return () => clearTimeout(timeoutId)
+    } else if (showGifPicker && !gifSearchQuery) {
+      loadGIFs()
+    }
+  }, [gifSearchQuery, showGifPicker])
+
+  const loadGIFs = useCallback(async () => {
+    setGifLoading(true)
+    try {
+      const response = await getTrendingGifs(20)
+      setGifs(response.results || [])
+      setGifNextPos(response.next)
+    } catch (error) {
+      console.error("Failed to load GIFs:", error)
+      setGifs([])
+    } finally {
+      setGifLoading(false)
+    }
+  }, [])
+
+  const searchGIFs = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      loadGIFs()
+      return
+    }
+    setGifLoading(true)
+    try {
+      const response = await searchGifs(query, 20)
+      setGifs(response.results || [])
+      setGifNextPos(response.next)
+    } catch (error) {
+      console.error("Failed to search GIFs:", error)
+      setGifs([])
+    } finally {
+      setGifLoading(false)
+    }
+  }, [loadGIFs])
+
+  const loadMoreGIFs = useCallback(async () => {
+    if (!gifNextPos || gifLoading) return
+    setGifLoading(true)
+    try {
+      const response = gifSearchQuery 
+        ? await searchGifs(gifSearchQuery, 20, gifNextPos)
+        : await getTrendingGifs(20, gifNextPos)
+      setGifs((prev) => [...prev, ...(response.results || [])])
+      setGifNextPos(response.next)
+    } catch (error) {
+      console.error("Failed to load more GIFs:", error)
+    } finally {
+      setGifLoading(false)
+    }
+  }, [gifNextPos, gifLoading, gifSearchQuery])
 
   // Scroll to bottom when messages change
   const scrollToBottom = useCallback(() => {
@@ -829,16 +904,55 @@ export default function DMPage() {
     }
   }, [selectedConversation, messages])
 
+  // Detect URLs in text
+  const detectLinks = (text: string): string[] => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    return text.match(urlRegex) || []
+  }
+
+  // Fetch link preview
+  const fetchLinkPreview = async (url: string) => {
+    try {
+      // Use a link preview service or fetch metadata
+      const response = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`)
+      if (response.ok) {
+        const data = await response.json()
+        return data
+      }
+    } catch (error) {
+      console.error("Failed to fetch link preview:", error)
+    }
+    return null
+  }
+
+  // Handle message input change with link detection
+  const handleMessageInputChange = (value: string) => {
+    setMessageInput(value)
+    
+    // Detect links
+    const links = detectLinks(value)
+    if (links.length > 0) {
+      fetchLinkPreview(links[0]).then(preview => {
+        if (preview) {
+          setLinkPreview({ url: links[0], ...preview })
+        }
+      })
+    } else {
+      setLinkPreview(null)
+    }
+  }
+
   const handleSendMessage = async (content: string, files?: File[]) => {
-    if ((!content.trim() && (!files || files.length === 0)) || !selectedConversation || !token) return
+    const filesToSend = files || selectedFiles
+    if ((!content.trim() && (!filesToSend || filesToSend.length === 0)) || !selectedConversation || !token) return
 
     try {
       let messageContent = content.trim()
       const attachmentUrls: string[] = []
 
       // Upload files if present
-      if (files && files.length > 0) {
-        for (const file of files) {
+      if (filesToSend && filesToSend.length > 0) {
+        for (const file of filesToSend) {
           const formData = new FormData()
           formData.append('file', file)
           formData.append('type', file.type.startsWith('audio/') ? 'audio' : file.type.startsWith('image/') ? 'image' : 'file')
@@ -865,14 +979,20 @@ export default function DMPage() {
           : `📎 ${attachmentUrls.length} attachment(s)`
       }
 
-      const response = await fetch("/api/messages", {
-        method: "POST",
+      // Handle editing
+      const url = editingMessage 
+        ? `/api/messages/${editingMessage.id}`
+        : "/api/messages"
+      const method = editingMessage ? "PUT" : "POST"
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          conversationId: selectedConversation.id,
+          ...(editingMessage ? {} : { conversationId: selectedConversation.id }),
           content: messageContent,
           attachments: attachmentUrls,
         }),
@@ -880,11 +1000,47 @@ export default function DMPage() {
 
       const result = await response.json()
       if (result.success && result.data) {
-        setMessages((prev) => [...prev, result.data])
+        if (editingMessage) {
+          setMessages((prev) => prev.map(m => m.id === editingMessage.id ? { ...m, ...result.data } : m))
+        } else {
+          setMessages((prev) => [...prev, result.data])
+        }
+        setMessageInput("")
+        setSelectedFiles([])
+        setLinkPreview(null)
+        setReplyingTo(null)
+        setEditingMessage(null)
         await loadConversations() // Re-fetch conversations to update last message/unread count
+      } else {
+        console.error("Failed to send message:", result.error)
+        alert(result.error || "Failed to send message. Please try again.")
       }
     } catch (error) {
       console.error("Failed to send message:", error)
+      alert("Failed to send message. Please check your connection and try again.")
+    }
+  }
+
+  const handleSendGif = async (gif: TenorGif) => {
+    if (!selectedConversation || !token) return
+    try {
+      setShowGifPicker(false)
+      const gifUrl = gif.media_formats.gif.url || gif.media_formats.tinygif.url
+      
+      // Try to fetch and upload the GIF
+      try {
+        const response = await fetch(gifUrl)
+        const blob = await response.blob()
+        const file = new File([blob], `gif_${gif.id}.gif`, { type: 'image/gif' })
+        await handleSendMessage("", [file])
+      } catch (error) {
+        // Fallback: send as URL
+        console.error("Failed to upload GIF, sending as URL:", error)
+        await handleSendMessage(`[GIF] ${gifUrl}`, [])
+      }
+    } catch (error) {
+      console.error("Failed to send GIF:", error)
+      alert("Failed to send GIF. Please try again.")
     }
   }
 
@@ -1348,6 +1504,53 @@ export default function DMPage() {
               </div>
             )}
 
+            {/* Link Preview */}
+            {linkPreview && (
+              <div className="px-4 py-2 bg-muted/30 border-t border-border/50">
+                <div className="flex items-start gap-3 p-2 bg-card rounded-lg border border-border/50">
+                  {linkPreview.image && (
+                    <img src={linkPreview.image} alt="Preview" className="w-20 h-20 object-cover rounded" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    {linkPreview.title && (
+                      <p className="text-sm font-medium text-foreground mb-1">{linkPreview.title}</p>
+                    )}
+                    {linkPreview.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2">{linkPreview.description}</p>
+                    )}
+                    <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block truncate">
+                      {linkPreview.url}
+                    </a>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setLinkPreview(null)}>
+                    <X size={14} />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Selected Files Preview */}
+            {selectedFiles.length > 0 && (
+              <div className="px-4 py-2 bg-muted/30 border-t border-border/50">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-card p-2 rounded-lg border border-border/50">
+                      <File size={16} className="text-muted-foreground" />
+                      <span className="text-xs text-foreground truncate max-w-[150px]">{file.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5"
+                        onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== index))}
+                      >
+                        <X size={12} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Message Input */}
             <div className="p-4 border-t border-border/50 bg-card/80 backdrop-blur-lg">
               {isRecording ? (
@@ -1362,7 +1565,10 @@ export default function DMPage() {
                     multiple
                     onChange={(e) => {
                       if (e.target.files && e.target.files.length > 0) {
-                        handleSendMessage("", Array.from(e.target.files))
+                        const files = Array.from(e.target.files)
+                        setSelectedFiles(files)
+                        // Optionally auto-send or show preview
+                        // handleSendMessage("", files)
                         e.target.value = "" // Clear the input
                       }
                     }}
@@ -1437,19 +1643,21 @@ export default function DMPage() {
                   </div>
 
                   <div className="flex-1 relative">
-                    <Input
-                      ref={inputRef}
-                      placeholder="Type a message..."
-                      value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault()
-                          handleSendMessage(messageInput)
-                        }
-                      }}
-                      className="pr-12 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/50 rounded-2xl h-11"
-                    />
+                    <div className="relative">
+                      <Textarea
+                        ref={inputRef}
+                        placeholder="Type a message..."
+                        value={messageInput}
+                        onChange={(e) => handleMessageInputChange(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault()
+                            handleSendMessage(messageInput)
+                          }
+                        }}
+                        className="pr-12 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/50 rounded-2xl min-h-[44px] max-h-32 resize-none"
+                        rows={1}
+                      />
                     <Button
                       variant="ghost"
                       size="icon"
@@ -1485,56 +1693,65 @@ export default function DMPage() {
                       </div>
                     )}
 
-                    {/* GIF Picker */}
+                    {/* Enhanced GIF Picker with Tenor */}
                     {showGifPicker && (
-                      <div className="absolute bottom-full right-0 mb-2 p-3 bg-card border border-border rounded-xl shadow-xl scale-in w-80 max-h-96 overflow-y-auto">
-                        <div className="space-y-3">
+                      <div className="absolute bottom-full right-0 mb-2 p-3 bg-card border border-border rounded-xl shadow-xl scale-in w-96 max-h-[500px] flex flex-col">
+                        <div className="space-y-3 flex-1 overflow-hidden flex flex-col">
                           <Input
                             placeholder="Search GIFs..."
                             value={gifSearchQuery}
                             onChange={(e) => setGifSearchQuery(e.target.value)}
                             className="mb-2"
                           />
-                          <div className="grid grid-cols-2 gap-2">
-                            {/* Sample GIFs - In production, use Giphy API */}
-                            {[
-                              "https://media.giphy.com/media/3o7aCTPPm4OHfRLSH6/giphy.gif",
-                              "https://media.giphy.com/media/l0MYC0LajaoPoHABu/giphy.gif",
-                              "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
-                              "https://media.giphy.com/media/3o7abldb0xnta2S3ug/giphy.gif",
-                            ].map((gifUrl, i) => (
-                              <button
-                                key={i}
-                                onClick={async () => {
-                                  // Send GIF as image attachment
-                                  try {
-                                    setShowGifPicker(false)
-                                    // Use the GIF URL directly instead of fetching
-                                    const gifBlob = await fetch(gifUrl, { mode: 'cors' }).then(r => r.blob()).catch(() => null)
-                                    if (!gifBlob) {
-                                      // Fallback: send as URL in message content
-                                      await handleSendMessage(`[GIF] ${gifUrl}`, [])
-                                      return
-                                    }
-                                    const file = new File([gifBlob], `gif_${Date.now()}.gif`, { type: 'image/gif' })
-                                    await handleSendMessage("", [file])
-                                  } catch (error) {
-                                    console.error("Failed to send GIF:", error)
-                                    // Fallback: send URL as text
-                                    try {
-                                      await handleSendMessage(`[GIF] ${gifUrl}`, [])
-                                    } catch (fallbackError) {
-                                      alert("Failed to send GIF. Please try again.")
-                                    }
-                                  }
-                                }}
-                                className="relative aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
-                              >
-                                <img src={gifUrl} alt={`GIF ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                              </button>
-                            ))}
+                          <div className="flex-1 overflow-y-auto">
+                            {gifLoading && gifs.length === 0 ? (
+                              <div className="flex items-center justify-center py-8">
+                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                              </div>
+                            ) : gifs.length === 0 ? (
+                              <div className="text-center py-8 text-muted-foreground text-sm">
+                                No GIFs found. Try a different search.
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-2 gap-2">
+                                {gifs.map((gif) => (
+                                  <button
+                                    key={gif.id}
+                                    onClick={() => handleSendGif(gif)}
+                                    className="relative aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity group"
+                                  >
+                                    <img 
+                                      src={gif.media_formats.tinygif?.url || gif.media_formats.gif?.url} 
+                                      alt={gif.title || "GIF"} 
+                                      className="w-full h-full object-cover" 
+                                      loading="lazy" 
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {gifNextPos && !gifLoading && (
+                              <div className="flex justify-center pt-4">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={loadMoreGIFs}
+                                  disabled={gifLoading}
+                                >
+                                  {gifLoading ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                      Loading...
+                                    </>
+                                  ) : (
+                                    "Load More"
+                                  )}
+                                </Button>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-xs text-muted-foreground text-center">Powered by Giphy</p>
+                          <p className="text-xs text-muted-foreground text-center">Powered by Tenor</p>
                         </div>
                       </div>
                     )}
@@ -1561,7 +1778,7 @@ export default function DMPage() {
                     )}
                   </div>
 
-                  {messageInput.trim() ? (
+                  {(messageInput.trim() || selectedFiles.length > 0) ? (
                     <Button
                       size="icon"
                       className="h-10 w-10 rounded-full flex-shrink-0 shadow-lg"
