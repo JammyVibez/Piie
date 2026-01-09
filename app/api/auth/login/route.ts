@@ -1,13 +1,41 @@
 import { NextResponse } from "next/server"
-import { findUserWithPasswordByEmail, validatePassword, generateToken, getFollowCounts } from "@/lib/auth"
+
+// Lazy load auth functions to prevent import-time errors
+async function getAuthFunctions() {
+  try {
+    const auth = await import("@/lib/auth")
+    return {
+      findUserWithPasswordByEmail: auth.findUserWithPasswordByEmail,
+      validatePassword: auth.validatePassword,
+      generateToken: auth.generateToken,
+      getFollowCounts: auth.getFollowCounts,
+    }
+  } catch (error) {
+    console.error("[Login API] Failed to import auth functions:", error)
+    throw new Error("Auth module failed to load")
+  }
+}
 
 export async function POST(request: Request) {
+  // Ensure we always return JSON, even if there's an error before try-catch
   try {
-    const { email, password } = await request.json()
+    // Parse request body with error handling
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      console.error("[Login API] JSON parse error:", parseError)
+      return NextResponse.json({ success: false, error: "Invalid request format" }, { status: 400 })
+    }
+
+    const { email, password } = body
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "Email and password are required" }, { status: 400 })
     }
+
+    // Lazy load auth functions
+    const { findUserWithPasswordByEmail, validatePassword, generateToken, getFollowCounts } = await getAuthFunctions()
 
     const user = await findUserWithPasswordByEmail(email)
     if (!user) {
@@ -49,7 +77,15 @@ export async function POST(request: Request) {
 
     return response
   } catch (error) {
-    console.error("[v0] Login error:", error)
-    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
+    console.error("[Login API] Error:", error)
+    const errorMessage = error instanceof Error ? error.message : "Internal server error"
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: "Internal server error",
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined
+      }, 
+      { status: 500 }
+    )
   }
 }

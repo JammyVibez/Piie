@@ -321,11 +321,17 @@ export default function SettingsPage() {
     const file = e.target.files?.[0]
     if (!file || !token) return
 
+    const mediaType = file.type.includes("gif")
+      ? "gif"
+      : file.type.includes("video")
+        ? "video"
+        : "image"
+
     setIsUploading(true)
     try {
       const formData = new FormData()
       formData.append("file", file)
-      formData.append("type", "image")
+      formData.append("type", mediaType)
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -351,11 +357,17 @@ export default function SettingsPage() {
     const file = e.target.files?.[0]
     if (!file || !token || !user) return
 
+    const mediaType = file.type.includes("gif")
+      ? "gif"
+      : file.type.includes("video")
+        ? "video"
+        : "image"
+
     setIsUploading(true)
     try {
       const formData = new FormData()
       formData.append("file", file)
-      formData.append("type", "image")
+      formData.append("type", mediaType)
 
       const response = await fetch("/api/upload", {
         method: "POST",

@@ -77,9 +77,14 @@ export async function findUserById(id: string): Promise<AuthUser | null> {
 }
 
 export async function findUserWithPasswordByEmail(email: string) {
-  return prisma.user.findUnique({
-    where: { email: email.toLowerCase() },
-  })
+  try {
+    return await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    })
+  } catch (error) {
+    console.error("[Auth] Error finding user by email:", error)
+    throw new Error("Database error while finding user")
+  }
 }
 
 export async function createUser(data: {
@@ -252,7 +257,8 @@ export async function getFollowCounts(userId: string): Promise<{ followers: numb
     ])
     return { followers, following }
   } catch (error) {
-    console.error("Error getting follow counts:", error)
+    console.error("[Auth] Error getting follow counts:", error)
+    // Return default values instead of throwing to prevent login failure
     return { followers: 0, following: 0 }
   }
 }

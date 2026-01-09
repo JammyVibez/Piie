@@ -145,6 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       })
 
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text()
+        console.error("Non-JSON response from login API:", text.substring(0, 200))
+        return { success: false, error: "Server error. Please try again later." }
+      }
+
       const data = await response.json()
 
       if (data.success) {
@@ -156,10 +164,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return { success: true }
       } else {
-        return { success: false, error: data.error }
+        return { success: false, error: data.error || "Login failed" }
       }
     } catch (error) {
       console.error("Login error:", error)
+      if (error instanceof SyntaxError) {
+        return { success: false, error: "Server returned invalid response. Please check your connection." }
+      }
       return { success: false, error: "Network error. Please try again." }
     }
   }

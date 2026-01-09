@@ -4,6 +4,15 @@ import { verifyToken } from "@/lib/auth"
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if Prisma is available
+    if (!prisma) {
+      console.error("[Fusion API] Prisma client not initialized")
+      return NextResponse.json(
+        { success: false, error: "Database connection not available" },
+        { status: 500 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get("userId")
     const limit = parseInt(searchParams.get("limit") || "10")
@@ -133,7 +142,15 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error("[Fusion API] Error fetching fusion posts:", error)
-    return NextResponse.json({ success: false, error: "Failed to fetch fusion posts" }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : "Unknown error"
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: "Failed to fetch fusion posts",
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined
+      }, 
+      { status: 500 }
+    )
   }
 }
 
