@@ -9,25 +9,8 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // Webpack config (only used when not using Turbopack)
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-      };
-    }
-    // Ignore generated Prisma files in webpack
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: [
-        "**/node_modules/**",
-        "**/.next/**",
-        "**/generated/**",
-      ],
-    };
-    return config;
-  },
+  // Enable Turbopack config to silence Next.js 16 error about webpack config
+  turbopack: {},
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: [
