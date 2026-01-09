@@ -2,12 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { AuthProvider } from "@/contexts/auth-context"
-import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { Providers } from "@/components/providers"
 import "./globals.css"
-// Import PWAInstallPrompt component for PWA installation prompt
-import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
-import { WhatsNewDialog } from "@/components/whats-new-dialog"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -79,15 +75,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="peakit" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <AuthProvider>
-          <ErrorBoundary>
-            {children}
-            {/* Render PWAInstallPrompt component */}
-            <PWAInstallPrompt />
-            <WhatsNewDialog />
-            <Analytics />
-          </ErrorBoundary>
-        </AuthProvider>
+        <Providers>
+          {children}
+        </Providers>
+        <Analytics />
       </body>
     </html>
   )
