@@ -44,13 +44,26 @@ export async function generateToken(user: AuthUser): Promise<string> {
 
 export async function verifyToken(token: string): Promise<{ userId: string; email: string; username: string } | null> {
   try {
+    if (!token || typeof token !== 'string' || token.trim().length === 0) {
+      return null
+    }
+    
     const { payload } = await jwtVerify(token, JWT_SECRET)
+    
+    if (!payload || !payload.userId || !payload.email || !payload.username) {
+      return null
+    }
+    
     return {
       userId: payload.userId as string,
       email: payload.email as string,
       username: payload.username as string,
     }
-  } catch {
+  } catch (error) {
+    // Log error in development for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Auth] Token verification failed:', error instanceof Error ? error.message : 'Unknown error')
+    }
     return null
   }
 }
@@ -275,21 +288,43 @@ export function getTokenFromRequest(
         cookies?: { get: (name: string) => { value: string } | undefined }
       }
 ): string | null {
-  // Try Authorization header first
-  const authHeader = request.headers.get("authorization")
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    return authHeader.substring(7)
-  }
-
-  // Fall back to cookie if available (for NextRequest)
-  if ("cookies" in request && request.cookies) {
-    const cookieToken = request.cookies.get("auth_token")
-    if (cookieToken) {
-      return cookieToken.value
+  try {
+    // Try Authorization header first
+    if (request.headers && typeof request.headers.get === 'function') {
+      const authHeader = request.headers.get("authorization")
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.substring(7).trim()
+        if (token) {
+          return token
+        }
+      }
     }
-  }
 
-  return null
+    // Fall back to cookie if available (for NextRequest)
+    if ("cookies" in request && request.cookies && typeof request.cookies.get === 'function') {
+      try {
+        const cookieToken = request.cookies.get("auth_token")
+        if (cookieToken && cookieToken.value) {
+          const token = cookieToken.value.trim()
+          if (token) {
+            return token
+          }
+        }
+      } catch (cookieError) {
+        // Cookies might not be available, continue
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[Auth] Cookie access error:', cookieError)
+        }
+      }
+    }
+
+    return null
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Auth] Error getting token from request:', error)
+    }
+    return null
+  }
 }
 
 /**

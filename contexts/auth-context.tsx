@@ -218,9 +218,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (token) {
         await fetch("/api/auth/logout", {
           method: "POST",
+          credentials: "include",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
+        }).catch(() => {
+          // Ignore network errors on logout
         })
       }
     } catch (error) {
