@@ -72,8 +72,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const response = await fetch("/api/auth/me", {
+        method: "GET",
+        credentials: "include", // Include cookies
         headers: {
           Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
         },
       })
 
@@ -139,6 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "include", // Include cookies
         headers: {
           "Content-Type": "application/json",
         },
@@ -179,6 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
+        credentials: "include", // Include cookies
         headers: {
           "Content-Type": "application/json",
         },

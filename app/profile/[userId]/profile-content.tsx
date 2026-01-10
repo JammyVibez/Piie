@@ -109,6 +109,7 @@ export function ProfileContent({ user, userPosts, fusionPosts, userId }: Profile
 
       try {
         const response = await fetch('/api/shop/items', {
+          credentials: "include",
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -142,6 +143,7 @@ export function ProfileContent({ user, userPosts, fusionPosts, userId }: Profile
       try {
         const response = await fetch(`/api/users/${userId}/follow`, {
           method: "GET",
+          credentials: "include",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -217,6 +219,7 @@ export function ProfileContent({ user, userPosts, fusionPosts, userId }: Profile
       const method = isFollowing ? "DELETE" : "POST"
       const response = await fetch(`/api/users/${userId}/follow`, {
         method,
+        credentials: "include",
         headers: {
           Authorization: `Bearer ${token}`,
         },

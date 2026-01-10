@@ -31,13 +31,10 @@ export async function GET(request: NextRequest) {
     if (userId) {
       where.authorId = userId
       // If viewing own posts, show all visibility levels
-      const authHeader = request.headers.get("authorization")
-      if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.substring(7)
-        const decoded = await verifyToken(token)
-        if (decoded && decoded.userId === userId) {
-          delete where.visibility
-        }
+      const { getAuthenticatedUser } = await import("@/lib/auth")
+      const currentUser = await getAuthenticatedUser(request)
+      if (currentUser && currentUser.userId === userId) {
+        delete where.visibility
       }
     }
 

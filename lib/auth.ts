@@ -262,3 +262,59 @@ export async function getFollowCounts(userId: string): Promise<{ followers: numb
     return { followers: 0, following: 0 }
   }
 }
+
+/**
+ * Extract JWT token from request headers or cookies
+ * Supports both Authorization header and cookie-based auth
+ */
+export function getTokenFromRequest(
+  request: 
+    | Request 
+    | { 
+        headers: { get: (name: string) => string | null } 
+        cookies?: { get: (name: string) => { value: string } | undefined }
+      }
+): string | null {
+  // Try Authorization header first
+  const authHeader = request.headers.get("authorization")
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.substring(7)
+  }
+
+  // Fall back to cookie if available (for NextRequest)
+  if ("cookies" in request && request.cookies) {
+    const cookieToken = request.cookies.get("auth_token")
+    if (cookieToken) {
+      return cookieToken.value
+    }
+  }
+
+  return null
+}
+
+/**
+ * Get authenticated user from request
+ * Returns null if not authenticated
+ */
+export async function getAuthenticatedUser(
+  request: 
+    | Request 
+    | { 
+        headers: { get: (name: string) => string | null } 
+        cookies?: { get: (name: string) => { value: string } | undefined }
+      }
+): Promise<{ userId: string; email: string; username: string } | null> {
+  const token = getTokenFromRequest(request)
+  if (!token) {
+    return null
+  }
+
+  return verifyToken(token)
+}
+
+/**
+ * Get JWT secret for use in server components
+ */
+export function getJWTSecret(): Uint8Array {
+  return JWT_SECRET
+}

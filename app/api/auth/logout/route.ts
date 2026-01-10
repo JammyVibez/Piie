@@ -1,20 +1,33 @@
 import { NextResponse } from "next/server"
-import { deleteSession } from "@/lib/auth"
+import { NextRequest } from "next/server"
+import { getTokenFromRequest, deleteSession } from "@/lib/auth"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization")
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const token = authHeader.substring(7)
-      await deleteSession(token)
+    const token = getTokenFromRequest(request)
+    if (token) {
+      await deleteSession(token).catch(() => {
+        // Session deletion is optional, don't fail logout if it fails
+      })
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Logout successful",
     })
+
+    // Clear auth cookie
+    response.cookies.set("auth_token", "", {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    })
+
+    return response
   } catch (error) {
-    console.error("[v0] Logout error:", error)
+    console.error("[Logout API] Error:", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
 }

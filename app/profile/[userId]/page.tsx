@@ -4,7 +4,7 @@ import { ProfileContent } from "./profile-content"
 import { prisma } from "@/lib/prisma"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
-import { jwtVerify } from "jose"
+import { verifyToken, findUserById } from "@/lib/auth"
 
 interface ProfilePageProps {
   params: Promise<{ userId: string }>
@@ -218,18 +218,12 @@ async function getCurrentUser() {
     
     if (!token) return null
     
-    const JWT_SECRET = new TextEncoder().encode(
-      process.env.JWT_SECRET || "your-super-secret-jwt-key-change-in-production"
-    )
+    const decoded = await verifyToken(token)
+    if (!decoded) return null
     
-    const { payload } = await jwtVerify(token, JWT_SECRET)
+    const user = await findUserById(decoded.userId)
     
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId as string },
-      select: { id: true }
-    })
-    
-    return user
+    return user ? { id: user.id } : null
   } catch (error) {
     return null
   }

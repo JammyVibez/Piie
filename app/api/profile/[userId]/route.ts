@@ -6,14 +6,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { userId } = await params
 
+    // Get current user if authenticated (optional for profile viewing)
     let currentUserId: string | null = null
-    const authHeader = request.headers.get("authorization")
-    if (authHeader?.startsWith("Bearer ")) {
-      const token = authHeader.substring(7)
-      const decoded = await verifyToken(token)
-      if (decoded) {
-        currentUserId = decoded.userId
-      }
+    const { getAuthenticatedUser } = await import("@/lib/auth")
+    const currentUser = await getAuthenticatedUser(request)
+    if (currentUser) {
+      currentUserId = currentUser.userId
     }
 
     // Try to find by ID first
@@ -115,15 +113,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   try {
     const { userId } = await params
 
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ success: false, error: "Authentication required" }, { status: 401 })
-    }
+    const { getAuthenticatedUser } = await import("@/lib/auth")
+    const currentUser = await getAuthenticatedUser(request)
 
-    const token = authHeader.substring(7)
-    const decoded = await verifyToken(token)
-
-    if (!decoded || decoded.userId !== userId) {
+    if (!currentUser || currentUser.userId !== userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 })
     }
 

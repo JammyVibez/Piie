@@ -41,7 +41,10 @@ export function MainFeed() {
         headers.Authorization = `Bearer ${tokenRef.current}`
       }
 
-      const response = await fetch(`/api/posts?page=${pageNum}&limit=10&sort=recent`, { headers })
+      const response = await fetch(`/api/posts?page=${pageNum}&limit=10&sort=recent`, { 
+        headers,
+        credentials: "include",
+      })
       
       if (!response.ok) {
         throw new Error(`Failed to fetch posts: ${response.status}`)
@@ -75,7 +78,10 @@ export function MainFeed() {
         headers.Authorization = `Bearer ${tokenRef.current}`
       }
 
-      const response = await fetch("/api/fusion?limit=5", { headers })
+      const response = await fetch("/api/fusion?limit=5", { 
+        headers,
+        credentials: "include",
+      })
       
       if (!response.ok) {
         throw new Error(`Failed to fetch fusion posts: ${response.status}`)

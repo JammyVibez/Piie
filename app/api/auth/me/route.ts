@@ -1,21 +1,16 @@
 import { NextResponse } from "next/server"
-import { verifyToken, findUserById, getFollowCounts } from "@/lib/auth"
+import { NextRequest } from "next/server"
+import { getAuthenticatedUser, findUserById, getFollowCounts } from "@/lib/auth"
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const currentUser = await getAuthenticatedUser(request)
+
+    if (!currentUser) {
       return NextResponse.json({ success: false, error: "No authorization token provided" }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
-    const decoded = await verifyToken(token)
-
-    if (!decoded) {
-      return NextResponse.json({ success: false, error: "Invalid or expired token" }, { status: 401 })
-    }
-
-    const user = await findUserById(decoded.userId)
+    const user = await findUserById(currentUser.userId)
     if (!user) {
       return NextResponse.json({ success: false, error: "User not found" }, { status: 404 })
     }
@@ -34,7 +29,7 @@ export async function GET(request: Request) {
       },
     })
   } catch (error) {
-    console.error("[v0] Get current user error:", error)
+    console.error("[Auth ME] Get current user error:", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
 }
